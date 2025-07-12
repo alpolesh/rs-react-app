@@ -2,11 +2,12 @@ import { Component } from 'react';
 
 interface SearchbarProps {
   onSearch: (term: string) => void;
+  searchTerm: string;
 }
 
 class Searchbar extends Component<SearchbarProps> {
   state = {
-    input: '',
+    input: this.props.searchTerm || '',
   };
 
   handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
