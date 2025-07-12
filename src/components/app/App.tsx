@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
+import Spinner from '@components/spinner/Spinner';
+import { calculateWaitTime } from '@src/helpers';
 
 interface Game {
   name: string;
@@ -26,6 +28,8 @@ class App extends Component {
 
   loadData = (term: string) => {
     this.setState({ isLoading: true, error: null });
+    const minSpinnerTime = 500;
+    const startTime = Date.now();
 
     fetch(`https://zelda.fanapis.com/api/games?name=${term}`)
       .then((response) => {
@@ -45,7 +49,10 @@ class App extends Component {
         this.setState({ error: error.message });
       })
       .finally(() => {
-        this.setState({ isLoading: false });
+        const waitTime = calculateWaitTime(minSpinnerTime, startTime);
+        setTimeout(() => {
+          this.setState({ isLoading: false });
+        }, waitTime);
       });
   };
 
@@ -56,6 +63,7 @@ class App extends Component {
   render() {
     return (
       <div>
+        {this.state.isLoading && <Spinner />}
         <SearchBar
           onSearch={this.handleSearch}
           searchTerm={this.state.searchTerm}
