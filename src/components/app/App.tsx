@@ -3,6 +3,7 @@ import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
 import { calculateWaitTime } from '@src/helpers';
+import './App.css';
 
 interface Game {
   name: string;
@@ -62,13 +63,13 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <div className="app-container max-w-2xl mx-auto px-4 py-4">
         {this.state.isLoading && <Spinner />}
         <SearchBar
           onSearch={this.handleSearch}
           searchTerm={this.state.searchTerm}
         />
-        <Results results={this.state.results} />
+        <Results results={this.state.results} error={this.state.error} />
       </div>
     );
   }
