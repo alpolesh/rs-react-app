@@ -1,9 +1,11 @@
 import { Component } from 'react';
 import ErrorResults from '@components/results/ErrorResults';
+import ResultItem from '@components/results/ResultItem';
 
 interface SearchResult {
   name: string;
   description: string;
+  id: string;
 }
 
 interface ResultsProps {
@@ -47,15 +49,15 @@ class Results extends Component<ResultsProps, ResultsState> {
           <p className="text-gray-500 italic">No results found.</p>
         ) : (
           <ul className="space-y-2">
-            {results.map((item, index) => (
-              <li
-                key={index}
-                className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition"
-              >
-                <strong className="text-gray-800">{item.name}</strong>
-                <span className="text-gray-600">: {item.description}</span>
-              </li>
-            ))}
+            {results.map((item) => {
+              return (
+                <ResultItem
+                  key={item.id}
+                  name={item.name}
+                  description={item.description}
+                />
+              );
+            })}
           </ul>
         )}
 

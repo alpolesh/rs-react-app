@@ -8,6 +8,7 @@ import './App.css';
 interface Game {
   name: string;
   description: string;
+  id: string;
 }
 interface AppState {
   searchTerm: string;
