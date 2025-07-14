@@ -1,9 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import App from './App.tsx';
+import App from './components/app/App.tsx';
+import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary.tsx';
 
 const container = document.getElementById('root');
+container?.classList.add('w-full');
 
 if (!container) {
   throw new Error('Root element not found');
@@ -11,6 +13,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>
 );
