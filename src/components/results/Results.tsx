@@ -3,8 +3,8 @@ import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
 
 interface SearchResult {
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   id: string;
 }
 
