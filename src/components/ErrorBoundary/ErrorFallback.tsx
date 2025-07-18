@@ -1,9 +1,9 @@
 import { Component } from 'react';
 
 class ErrorFallback extends Component {
-  handleReload = () => {
+  handleReload() {
     window.location.reload();
-  };
+  }
 
   render() {
     return (
