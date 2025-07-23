@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
@@ -14,26 +14,26 @@ interface Game {
   description: string;
   id: string;
 }
-interface AppState {
-  searchTerm: string;
-  results: Game[];
-  isLoading: boolean;
-  error: string | null;
-}
-class App extends Component {
-  state: AppState = {
-    searchTerm: getItemFromLocalStorage('searchTerm') || '',
-    results: [],
-    isLoading: false,
-    error: null,
+type SearchTerm = string;
+type Results = Game[];
+type IsLoading = boolean;
+type Error = string | null;
+function App() {
+  const [searchTerm, setSearchTerm] = useState<SearchTerm>(
+    getItemFromLocalStorage('searchTerm') || ''
+  );
+  const [results, setResults] = useState<Results>([]);
+  const [isLoading, setIsLoading] = useState<IsLoading>(false);
+  const [error, setError] = useState<Error>(null);
+
+  const handleSearch = (term: string) => {
+    loadData(term);
   };
 
-  handleSearch = (term: string) => {
-    this.loadData(term);
-  };
+  const loadData = (term: string) => {
+    setIsLoading(true);
+    setError(null);
 
-  loadData = (term: string) => {
-    this.setState({ isLoading: true, error: null });
     const minSpinnerTime = 500;
     const startTime = Date.now();
 
@@ -45,39 +45,33 @@ class App extends Component {
         return response.json();
       })
       .then((data) => {
-        this.setState({
-          results: data.data,
-          searchTerm: term,
-        });
+        setResults(data.data);
+        setSearchTerm(term);
+
         setItemToLocalStorage('searchTerm', term);
       })
       .catch((error) => {
-        this.setState({ error: error.message });
+        setError(error.message);
       })
       .finally(() => {
         const waitTime = calculateWaitTime(minSpinnerTime, startTime);
         setTimeout(() => {
-          this.setState({ isLoading: false });
+          setIsLoading(false);
         }, waitTime);
       });
   };
 
-  componentDidMount() {
-    this.loadData(this.state.searchTerm);
-  }
+  useEffect(() => {
+    loadData(searchTerm);
+  }, [searchTerm]);
 
-  render() {
-    return (
-      <div className="app-container max-w-2xl mx-auto px-4 py-4">
-        {this.state.isLoading && <Spinner />}
-        <SearchBar
-          onSearch={this.handleSearch}
-          searchTerm={this.state.searchTerm}
-        />
-        <Results results={this.state.results} error={this.state.error} />
-      </div>
-    );
-  }
+  return (
+    <div className="app-container max-w-2xl mx-auto px-4 py-4">
+      {isLoading && <Spinner />}
+      <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
+      <Results results={results} error={error} />
+    </div>
+  );
 }
 
 export default App;

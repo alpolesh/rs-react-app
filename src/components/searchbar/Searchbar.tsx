@@ -1,42 +1,34 @@
-import { Component } from 'react';
+import { useState } from 'react';
 
 interface SearchbarProps {
   onSearch: (term: string) => void;
   searchTerm: string;
 }
 
-interface SearchbarState {
-  input: string;
-}
+function Searchbar({ searchTerm, onSearch }: SearchbarProps) {
+  const [inputValue, setInputValue] = useState(searchTerm || '');
 
-class Searchbar extends Component<SearchbarProps, SearchbarState> {
-  state = {
-    input: this.props.searchTerm || '',
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
   };
 
-  handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ input: event.target.value });
+  const handleSearchClick = () => {
+    onSearch(inputValue.trim());
+    setInputValue((prevState) => prevState.trim());
   };
 
-  handleSearchClick = () => {
-    this.props.onSearch(this.state.input.trim());
-    this.setState((prevState) => ({ input: prevState.input.trim() }));
-  };
-
-  render() {
-    return (
-      <div className="flex items-center justify-center space-x-4 p-4 max-w-sm mx-auto">
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
-          type="text"
-          value={this.state.input}
-          onChange={this.handleInputChange}
-          placeholder="Search..."
-        />
-        <button onClick={this.handleSearchClick}>Search</button>
-      </div>
-    );
-  }
+  return (
+    <div className="flex items-center justify-center space-x-4 p-4 max-w-sm mx-auto">
+      <input
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        placeholder="Search..."
+      />
+      <button onClick={handleSearchClick}>Search</button>
+    </div>
+  );
 }
 
 export default Searchbar;
