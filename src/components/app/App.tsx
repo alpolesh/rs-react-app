@@ -2,7 +2,11 @@ import { Component } from 'react';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
-import { calculateWaitTime } from '@src/helpers';
+import {
+  calculateWaitTime,
+  getItemFromLocalStorage,
+  setItemToLocalStorage,
+} from '@src/helpers';
 import './App.css';
 
 interface Game {
@@ -18,7 +22,7 @@ interface AppState {
 }
 class App extends Component {
   state: AppState = {
-    searchTerm: localStorage.getItem('searchTerm') || '',
+    searchTerm: getItemFromLocalStorage('searchTerm') || '',
     results: [],
     isLoading: false,
     error: null,
@@ -45,7 +49,7 @@ class App extends Component {
           results: data.data,
           searchTerm: term,
         });
-        localStorage.setItem('searchTerm', term);
+        setItemToLocalStorage('searchTerm', term);
       })
       .catch((error) => {
         this.setState({ error: error.message });

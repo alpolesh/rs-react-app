@@ -1,13 +1,13 @@
 import { Component } from 'react';
 
 interface ResultItemProps {
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
 }
 
 class ResultItem extends Component<ResultItemProps> {
   render() {
-    const { name, description } = this.props;
+    const { name = 'No name', description = 'No description' } = this.props;
 
     return (
       <li className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition">

@@ -25,7 +25,7 @@ class Searchbar extends Component<SearchbarProps, SearchbarState> {
 
   render() {
     return (
-      <div className="flex  items-center justify-center space-x-4 p-4 max-w-sm mx-auto">
+      <div className="flex items-center justify-center space-x-4 p-4 max-w-sm mx-auto">
         <input
           className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
           type="text"
