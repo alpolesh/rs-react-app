@@ -25,7 +25,7 @@ describe('App integration Tests', () => {
   it('handles search term from localStorage on initial load', () => {
     const mockedSearchTerm = 'Zelda';
     vi.spyOn(window.localStorage.__proto__, 'getItem').mockReturnValue(
-      mockedSearchTerm
+      JSON.stringify(mockedSearchTerm)
     );
     vi.stubGlobal(
       'fetch',
@@ -143,7 +143,7 @@ describe('App api integration tests', () => {
     await waitFor(() => {
       expect(localStorage.setItem).toHaveBeenCalledWith(
         'searchTerm',
-        'Wind Waker'
+        JSON.stringify('Wind Waker')
       );
     });
   });

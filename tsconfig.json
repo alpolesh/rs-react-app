@@ -10,6 +10,7 @@
       "@src/*": ["src/*"],
       "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   }
 }
