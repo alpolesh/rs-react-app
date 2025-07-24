@@ -1,5 +1,6 @@
 import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
+import Pagination from '@components/pagination/Pagination';
 
 interface SearchResult {
   name?: string;
@@ -10,9 +11,14 @@ interface SearchResult {
 interface ResultsProps {
   results: SearchResult[];
   error: string | null;
+  currentPage: number;
+  onChangePage: (page: number) => void;
 }
 
-function Results({ results, error }: ResultsProps) {
+function Results({ results, error, currentPage, onChangePage }: ResultsProps) {
+  const itemsPerPage = 3;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 space-y-6 w-full">
       <h3 className="text-xl text-center font-semibold text-gray-800">
@@ -26,17 +32,25 @@ function Results({ results, error }: ResultsProps) {
       ) : results.length === 0 ? (
         <p className="text-gray-500 italic">No results found.</p>
       ) : (
-        <ul className="space-y-2">
-          {results.map((item) => {
-            return (
-              <ResultItem
-                key={item.id}
-                name={item.name}
-                description={item.description}
-              />
-            );
-          })}
-        </ul>
+        <>
+          <ul className="space-y-2">
+            {paginatedResults.map((item) => {
+              return (
+                <ResultItem
+                  key={item.id}
+                  name={item.name}
+                  description={item.description}
+                />
+              );
+            })}
+          </ul>
+          <Pagination
+            currentPage={currentPage}
+            onChangePage={onChangePage}
+            itemsPerPage={itemsPerPage}
+            totalItems={results.length}
+          />
+        </>
       )}
     </div>
   );

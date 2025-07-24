@@ -26,7 +26,9 @@ function Searchbar({ searchTerm, onSearch }: SearchbarProps) {
         onChange={handleInputChange}
         placeholder="Search..."
       />
-      <button onClick={handleSearchClick}>Search</button>
+      <button onClick={handleSearchClick} className="bg-black">
+        Search
+      </button>
     </div>
   );
 }

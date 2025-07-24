@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
@@ -19,6 +20,9 @@ type Results = Game[];
 type IsLoading = boolean;
 type Error = string | null;
 function App() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageParam = Number(searchParams.get('page') || '1');
+  const [currentPage, setCurrentPage] = useState(pageParam);
   const [searchTerm, setSearchTerm] = useState<SearchTerm>(
     getItemFromLocalStorage('searchTerm') || ''
   );
@@ -61,15 +65,28 @@ function App() {
       });
   };
 
+  const handleChangePage = (page: number) => {
+    setSearchParams({ page: page.toString() });
+  };
+
   useEffect(() => {
     loadData(searchTerm);
   }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(pageParam);
+  }, [pageParam]);
 
   return (
     <div className="app-container max-w-2xl mx-auto px-4 py-4">
       {isLoading && <Spinner />}
       <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
-      <Results results={results} error={error} />
+      <Results
+        results={results}
+        error={error}
+        currentPage={currentPage}
+        onChangePage={handleChangePage}
+      />
     </div>
   );
 }
