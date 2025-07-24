@@ -13,9 +13,16 @@ interface ResultsProps {
   error: string | null;
   currentPage: number;
   onChangePage: (page: number) => void;
+  onChangeGameId: (gameId: string) => void;
 }
 
-function Results({ results, error, currentPage, onChangePage }: ResultsProps) {
+function Results({
+  results,
+  error,
+  currentPage,
+  onChangePage,
+  onChangeGameId,
+}: ResultsProps) {
   const itemsPerPage = 3;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
@@ -38,6 +45,8 @@ function Results({ results, error, currentPage, onChangePage }: ResultsProps) {
               return (
                 <ResultItem
                   key={item.id}
+                  gameId={item.id}
+                  onChangeGameId={onChangeGameId}
                   name={item.name}
                   description={item.description}
                 />
