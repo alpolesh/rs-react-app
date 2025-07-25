@@ -5,7 +5,7 @@ import About from '@components/about/About';
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<App />} />
+      <Route path="/" element={<App />}></Route>
       <Route path="/about" element={<About />} />
     </Routes>
   );

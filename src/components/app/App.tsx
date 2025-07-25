@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { useSearchParams, Link } from 'react-router';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
@@ -127,26 +127,38 @@ function App() {
   }, [selectedGameId]);
 
   return (
-    <div className="app-container flex items-center gap-4 mx-auto px-4 py-4">
+    <>
       {isLoading && <Spinner />}
-      <div className="flex-1">
-        <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
-        <Results
-          results={results}
-          error={loadResultsError}
-          currentPage={currentPage}
-          onChangePage={handleChangePage}
-          onChangeGameId={handleChangeGameId}
-        />
-      </div>
+      <div className="min-h-screen flex flex-col px-4 py-4">
+        <div className="flex items-center">
+          <Link to="/about">
+            <button className="bg-green-500 text-white px-4 py-2 rounded shadow">
+              About
+            </button>
+          </Link>
+          <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
+        </div>
 
-      {selectedGameId && (
-        <DetailedView
-          selectedGame={selectedGame}
-          loadGameError={loadGameError}
-        />
-      )}
-    </div>
+        <div className="flex flex-1 gap-4">
+          <div className="flex-1">
+            <Results
+              results={results}
+              error={loadResultsError}
+              currentPage={currentPage}
+              onChangePage={handleChangePage}
+              onChangeGameId={handleChangeGameId}
+            />
+          </div>
+
+          {selectedGameId && (
+            <DetailedView
+              selectedGame={selectedGame}
+              loadGameError={loadGameError}
+            />
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
