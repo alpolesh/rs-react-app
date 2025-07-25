@@ -5,8 +5,10 @@ import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
 import DetailedView from '@components/detailedView/DetailedView';
 import { calculateWaitTime } from '@src/helpers';
+import { fetchGamesByName, fetchGameById } from '@src/api/games';
 import useLocalStorage from '@src/hooks/useLocalStorage';
 import type { Game, SelectedGameId } from '@src/types/game';
+import { PaginationContext } from '@src/context/PaginationContext';
 import './App.css';
 
 type SearchTerm = string;
@@ -31,9 +33,16 @@ function App() {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [loadGameError, setLoadGameError] = useState<Error>(null);
 
+  const setParamToExistedParams = (key: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    setSearchParams(newParams);
+  };
+
   const handleSearch = (term: string) => {
     loadData(term);
     setSearchTerm(term);
+    setParamToExistedParams('page', '1');
   };
 
   const loadData = useCallback((term: string) => {
@@ -43,15 +52,9 @@ function App() {
     const minSpinnerTime = 500;
     const startTime = Date.now();
 
-    fetch(`https://zelda.fanapis.com/api/games?name=${term}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+    fetchGamesByName(term)
       .then((data) => {
-        setResults(data.data);
+        setResults(data);
       })
       .catch((error) => {
         setLoadResultsError(error.message);
@@ -71,15 +74,9 @@ function App() {
     const minSpinnerTime = 500;
     const startTime = Date.now();
 
-    fetch(`https://zelda.fanapis.com/api/games/${gameId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+    fetchGameById(gameId)
       .then((data) => {
-        setSelectedGame(data.data);
+        setSelectedGame(data);
       })
       .catch((error) => {
         setLoadGameError(error.message);
@@ -93,15 +90,11 @@ function App() {
   };
 
   const handleChangePage = (page: number) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('page', page.toString());
-    setSearchParams(newParams);
+    setParamToExistedParams('page', page.toString());
   };
 
   const handleChangeGameId = (gameId: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('gameid', gameId);
-    setSearchParams(newParams);
+    setParamToExistedParams('gameid', gameId);
   };
 
   useEffect(() => {
@@ -123,7 +116,7 @@ function App() {
   }, [selectedGameId]);
 
   return (
-    <>
+    <PaginationContext.Provider value={{ currentPage, handleChangePage }}>
       {isLoading && <Spinner />}
       <div className="min-h-screen flex flex-col px-4 py-4">
         <div className="flex items-center">
@@ -140,8 +133,6 @@ function App() {
             <Results
               results={results}
               error={loadResultsError}
-              currentPage={currentPage}
-              onChangePage={handleChangePage}
               onChangeGameId={handleChangeGameId}
             />
           </div>
@@ -154,7 +145,7 @@ function App() {
           )}
         </div>
       </div>
-    </>
+    </PaginationContext.Provider>
   );
 }
 

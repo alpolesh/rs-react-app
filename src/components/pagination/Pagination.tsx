@@ -1,18 +1,15 @@
+import { useContext } from 'react';
+import { PaginationContext } from '@src/context/PaginationContext';
 import { getPageNumbers } from '@src/helpers';
 
 interface PaginationProps {
-  currentPage: number;
-  onChangePage: (page: number) => void;
   itemsPerPage: number;
   totalItems: number;
 }
 
-function Pagination({
-  currentPage,
-  onChangePage,
-  itemsPerPage,
-  totalItems,
-}: PaginationProps) {
+function Pagination({ itemsPerPage, totalItems }: PaginationProps) {
+  const pagination = useContext(PaginationContext);
+  const { currentPage, handleChangePage } = pagination;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const pageNumbers = getPageNumbers(currentPage, totalPages);
   return (
@@ -21,7 +18,7 @@ function Pagination({
       aria-label="Pagination"
     >
       <button
-        onClick={() => onChangePage(currentPage - 1)}
+        onClick={() => handleChangePage(currentPage - 1)}
         disabled={currentPage === 1}
         className="px-3 py-1 bg-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:pointer-events-none"
       >
@@ -39,7 +36,7 @@ function Pagination({
         ) : (
           <button
             key={`page-${page}`}
-            onClick={() => onChangePage(page)}
+            onClick={() => handleChangePage(page)}
             className={`px-3 py-1 border rounded-md ${
               page === currentPage
                 ? 'bg-blue-500 border-blue-600'
@@ -52,7 +49,7 @@ function Pagination({
       )}
 
       <button
-        onClick={() => onChangePage(currentPage + 1)}
+        onClick={() => handleChangePage(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="px-3 py-1 bg-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:pointer-events-none"
       >

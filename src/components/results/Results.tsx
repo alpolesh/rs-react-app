@@ -1,6 +1,8 @@
+import { useContext } from 'react';
 import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
 import Pagination from '@components/pagination/Pagination';
+import { PaginationContext } from '@src/context/PaginationContext';
 
 interface SearchResult {
   name?: string;
@@ -11,18 +13,13 @@ interface SearchResult {
 interface ResultsProps {
   results: SearchResult[];
   error: string | null;
-  currentPage: number;
-  onChangePage: (page: number) => void;
   onChangeGameId: (gameId: string) => void;
 }
 
-function Results({
-  results,
-  error,
-  currentPage,
-  onChangePage,
-  onChangeGameId,
-}: ResultsProps) {
+function Results({ results, error, onChangeGameId }: ResultsProps) {
+  const pagination = useContext(PaginationContext);
+  const { currentPage } = pagination;
+
   const itemsPerPage = 3;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
@@ -53,12 +50,7 @@ function Results({
               );
             })}
           </ul>
-          <Pagination
-            currentPage={currentPage}
-            onChangePage={onChangePage}
-            itemsPerPage={itemsPerPage}
-            totalItems={results.length}
-          />
+          <Pagination itemsPerPage={itemsPerPage} totalItems={results.length} />
         </>
       )}
     </div>
