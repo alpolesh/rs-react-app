@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
 import DetailedView from '@components/detailedView/DetailedView';
-import {
-  calculateWaitTime,
-  getItemFromLocalStorage,
-  setItemToLocalStorage,
-} from '@src/helpers';
+import { calculateWaitTime } from '@src/helpers';
+import useLocalStorage from '@src/hooks/useLocalStorage';
 import type { Game, SelectedGameId } from '@src/types/game';
 import './App.css';
 
@@ -21,8 +18,9 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const pageParam = Number(searchParams.get('page') || '1');
   const [currentPage, setCurrentPage] = useState(pageParam);
-  const [searchTerm, setSearchTerm] = useState<SearchTerm>(
-    getItemFromLocalStorage('searchTerm') || ''
+  const [searchTerm, setSearchTerm] = useLocalStorage<SearchTerm>(
+    'searchTerm',
+    ''
   );
   const [results, setResults] = useState<Results>([]);
   const [isLoading, setIsLoading] = useState<IsLoading>(false);
@@ -35,9 +33,10 @@ function App() {
 
   const handleSearch = (term: string) => {
     loadData(term);
+    setSearchTerm(term);
   };
 
-  const loadData = (term: string) => {
+  const loadData = useCallback((term: string) => {
     setIsLoading(true);
     setLoadResultsError(null);
 
@@ -53,9 +52,6 @@ function App() {
       })
       .then((data) => {
         setResults(data.data);
-        setSearchTerm(term);
-
-        setItemToLocalStorage('searchTerm', term);
       })
       .catch((error) => {
         setLoadResultsError(error.message);
@@ -66,7 +62,7 @@ function App() {
           setIsLoading(false);
         }, waitTime);
       });
-  };
+  }, []);
 
   const loadSelectedGame = (gameId: string) => {
     setIsLoading(true);
@@ -110,7 +106,7 @@ function App() {
 
   useEffect(() => {
     loadData(searchTerm);
-  }, [searchTerm]);
+  }, [searchTerm, loadData]);
 
   useEffect(() => {
     setCurrentPage(pageParam);
