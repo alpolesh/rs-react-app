@@ -1,8 +1,6 @@
 import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary';
-import Results from '@components/results/Results';
 import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 describe('ErrorBoundary', () => {
   vi.mock('@components/ErrorBoundary/ErrorFallback', () => ({
@@ -29,17 +27,6 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    expect(screen.getByTestId('error-fallback')).toBeInTheDocument();
-  });
-
-  it('triggers errorFallback if error button is clicked', async () => {
-    render(
-      <ErrorBoundary>
-        <Results results={[]} error="Specific error" />
-      </ErrorBoundary>
-    );
-    const errorButton = screen.getByRole('button', { name: /Simulate Error/i });
-    await userEvent.click(errorButton);
     expect(screen.getByTestId('error-fallback')).toBeInTheDocument();
   });
 

@@ -1,4 +1,5 @@
 import App from '@components/app/App';
+import { BrowserRouter } from 'react-router';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
@@ -15,7 +16,11 @@ describe('App integration Tests', () => {
       json: () => Promise.resolve({ data: [] }),
     } as Response);
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
 
     await waitFor(() => {
       expect(mockedFetch).toHaveBeenCalled();
@@ -32,7 +37,11 @@ describe('App integration Tests', () => {
       vi.fn(() => Promise.resolve())
     );
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
 
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining(mockedSearchTerm)
@@ -50,7 +59,11 @@ describe('App integration Tests', () => {
       )
     );
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
 
@@ -72,7 +85,11 @@ describe('App api integration tests', () => {
       vi.fn(() => Promise.resolve())
     );
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
     const input = screen.getByPlaceholderText(/search/i);
     const button = screen.getByRole('button', { name: /search/i });
 
@@ -101,7 +118,11 @@ describe('App api integration tests', () => {
       )
     );
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
     await waitFor(() => {
       expect(screen.getByText(/Zelda/)).toBeInTheDocument();
       expect(screen.getByText(/Link/)).toBeInTheDocument();
@@ -114,7 +135,11 @@ describe('App api integration tests', () => {
       vi.fn().mockRejectedValue(new Error('Network Error'))
     );
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
     await waitFor(() =>
       expect(screen.getByText(/network error/i)).toBeInTheDocument()
     );
@@ -132,7 +157,11 @@ describe('App api integration tests', () => {
       )
     );
 
-    render(<App />);
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
     const input = screen.getByPlaceholderText(/search/i);
     const button = screen.getByRole('button', { name: /search/i });
 

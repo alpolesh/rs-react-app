@@ -1,6 +1,8 @@
-import { Component } from 'react';
+import { useContext } from 'react';
 import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
+import Pagination from '@components/pagination/Pagination';
+import { PaginationContext } from '@src/context/PaginationContext';
 
 interface SearchResult {
   name?: string;
@@ -11,67 +13,48 @@ interface SearchResult {
 interface ResultsProps {
   results: SearchResult[];
   error: string | null;
+  onChangeGameId: (gameId: string) => void;
 }
 
-interface ResultsState {
-  simulateCrash: boolean;
-}
+function Results({ results, error, onChangeGameId }: ResultsProps) {
+  const pagination = useContext(PaginationContext);
+  const { currentPage } = pagination;
 
-class Results extends Component<ResultsProps, ResultsState> {
-  state: ResultsState = {
-    simulateCrash: false,
-  };
+  const itemsPerPage = 3;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
+  return (
+    <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 space-y-6 w-full">
+      <h3 className="text-xl text-center font-semibold text-gray-800">
+        Search Results
+      </h3>
 
-  handleErrorButtonClick = () => {
-    this.setState({ simulateCrash: true });
-  };
-
-  componentDidUpdate() {
-    if (this.state.simulateCrash) {
-      throw new Error('Simulated render error');
-    }
-  }
-
-  render() {
-    const { results, error } = this.props;
-
-    return (
-      <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 space-y-6 w-full">
-        <h3 className="text-xl text-center font-semibold text-gray-800">
-          Search Results
-        </h3>
-
-        {error ? (
-          <div className="text-red-600">
-            <ErrorResults error={error} />
-          </div>
-        ) : results.length === 0 ? (
-          <p className="text-gray-500 italic">No results found.</p>
-        ) : (
+      {error ? (
+        <div className="text-red-600">
+          <ErrorResults error={error} />
+        </div>
+      ) : results.length === 0 ? (
+        <p className="text-gray-500 italic">No results found.</p>
+      ) : (
+        <>
           <ul className="space-y-2">
-            {results.map((item) => {
+            {paginatedResults.map((item) => {
               return (
                 <ResultItem
                   key={item.id}
+                  gameId={item.id}
+                  onChangeGameId={onChangeGameId}
                   name={item.name}
                   description={item.description}
                 />
               );
             })}
           </ul>
-        )}
-
-        <div>
-          <button
-            onClick={this.handleErrorButtonClick}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-          >
-            Simulate Error
-          </button>
-        </div>
-      </div>
-    );
-  }
+          <Pagination itemsPerPage={itemsPerPage} totalItems={results.length} />
+        </>
+      )}
+    </div>
+  );
 }
 
 export default Results;
