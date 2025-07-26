@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router';
 import App from '@components/app/App';
 import About from '@components/about/About';
-import NotFound from '@components/NotFound/NotFound';
+import NotFound from '@src/components/notfound/NotFound';
 
 export default function AppRoutes() {
   return (

@@ -14,20 +14,34 @@ const mockGame: Game = {
 describe('DetailedView', () => {
   it('renders nothing if selectedGame is null', () => {
     const { container } = render(
-      <DetailedView selectedGame={null} loadGameError={null} />
+      <DetailedView
+        selectedGame={null}
+        loadGameError={null}
+        setSelectedGameId={vi.fn()}
+      />
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('renders error if loadGameError is provided', () => {
     render(
-      <DetailedView selectedGame={mockGame} loadGameError="Failed to load" />
+      <DetailedView
+        selectedGame={mockGame}
+        loadGameError="Failed to load"
+        setSelectedGameId={vi.fn()}
+      />
     );
     expect(screen.getByText(/Failed to load/i)).toBeInTheDocument();
   });
 
   it('renders game details if selectedGame is provided and no error', () => {
-    render(<DetailedView selectedGame={mockGame} loadGameError={null} />);
+    render(
+      <DetailedView
+        selectedGame={mockGame}
+        loadGameError={null}
+        setSelectedGameId={vi.fn()}
+      />
+    );
 
     expect(screen.queryByText('Id')).not.toBeInTheDocument();
     expect(screen.getByText('The Legend of Zelda')).toBeInTheDocument();

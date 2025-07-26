@@ -141,6 +141,7 @@ function App() {
             <DetailedView
               selectedGame={selectedGame}
               loadGameError={loadGameError}
+              setSelectedGameId={setSelectedGameId}
             />
           )}
         </div>
