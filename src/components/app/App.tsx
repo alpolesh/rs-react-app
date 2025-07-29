@@ -7,8 +7,8 @@ import DetailedView from '@components/detailedView/DetailedView';
 import { calculateWaitTime } from '@src/helpers';
 import { fetchGamesByName, fetchGameById } from '@src/api/games';
 import useLocalStorage from '@src/hooks/useLocalStorage';
-import type { Game, SelectedGameId } from '@src/types/game';
-import { PaginationContext } from '@src/context/PaginationContext';
+import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
+import type { Game } from '@src/types/game';
 import './App.css';
 
 type SearchTerm = string;
@@ -18,8 +18,9 @@ type Error = string | null;
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const pageParam = Number(searchParams.get('page') || '1');
-  const [currentPage, setCurrentPage] = useState(pageParam);
+
+  const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
+    useCustomSearchParams('gameid');
   const [searchTerm, setSearchTerm] = useLocalStorage<SearchTerm>(
     'searchTerm',
     ''
@@ -28,8 +29,6 @@ function App() {
   const [isLoading, setIsLoading] = useState<IsLoading>(false);
   const [loadResultsError, setLoadResultsError] = useState<Error>(null);
 
-  const [selectedGameId, setSelectedGameId] = useState<SelectedGameId>(null);
-  const selectedGameIdParam = searchParams.get('gameid') || null;
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [loadGameError, setLoadGameError] = useState<Error>(null);
 
@@ -89,12 +88,8 @@ function App() {
       });
   };
 
-  const handleChangePage = (page: number) => {
-    setParamToExistedParams('page', page.toString());
-  };
-
   const handleChangeGameId = (gameId: string) => {
-    setParamToExistedParams('gameid', gameId);
+    setSelectedGameIdToExistedParams(gameId);
   };
 
   useEffect(() => {
@@ -102,21 +97,13 @@ function App() {
   }, [searchTerm, loadData]);
 
   useEffect(() => {
-    setCurrentPage(pageParam);
-  }, [pageParam]);
-
-  useEffect(() => {
-    setSelectedGameId(selectedGameIdParam);
+    if (selectedGameIdParam) {
+      loadSelectedGame(selectedGameIdParam);
+    }
   }, [selectedGameIdParam]);
 
-  useEffect(() => {
-    if (selectedGameId) {
-      loadSelectedGame(selectedGameId);
-    }
-  }, [selectedGameId]);
-
   return (
-    <PaginationContext.Provider value={{ currentPage, handleChangePage }}>
+    <>
       {isLoading && <Spinner />}
       <div className="min-h-screen flex flex-col px-4 py-4">
         <div className="flex items-center">
@@ -137,16 +124,16 @@ function App() {
             />
           </div>
 
-          {selectedGameId && (
+          {selectedGameIdParam && (
             <DetailedView
               selectedGame={selectedGame}
               loadGameError={loadGameError}
-              setSelectedGameId={setSelectedGameId}
+              resetSelectedGameId={handleChangeGameId}
             />
           )}
         </div>
       </div>
-    </PaginationContext.Provider>
+    </>
   );
 }
 

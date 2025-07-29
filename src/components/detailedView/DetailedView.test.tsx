@@ -17,7 +17,7 @@ describe('DetailedView', () => {
       <DetailedView
         selectedGame={null}
         loadGameError={null}
-        setSelectedGameId={vi.fn()}
+        resetSelectedGameId={vi.fn()}
       />
     );
     expect(container.firstChild).toBeNull();
@@ -28,7 +28,7 @@ describe('DetailedView', () => {
       <DetailedView
         selectedGame={mockGame}
         loadGameError="Failed to load"
-        setSelectedGameId={vi.fn()}
+        resetSelectedGameId={vi.fn()}
       />
     );
     expect(screen.getByText(/Failed to load/i)).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('DetailedView', () => {
       <DetailedView
         selectedGame={mockGame}
         loadGameError={null}
-        setSelectedGameId={vi.fn()}
+        resetSelectedGameId={vi.fn()}
       />
     );
 

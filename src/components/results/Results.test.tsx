@@ -1,5 +1,6 @@
 import Results from '@components/results/Results';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 
 describe('Results rendering tests', () => {
   it('renders correct number of items when data is provided', () => {
@@ -8,14 +9,20 @@ describe('Results rendering tests', () => {
       { id: '2' },
     ];
     render(
-      <Results results={mockResults} error="" onChangeGameId={() => {}} />
+      <MemoryRouter>
+        <Results results={mockResults} error="" onChangeGameId={() => {}} />
+      </MemoryRouter>
     );
     const items = screen.getAllByRole('listitem');
     expect(items).toHaveLength(mockResults.length);
   });
 
   it('displays "no results" message when data array is empty', () => {
-    render(<Results results={[]} error="" onChangeGameId={() => {}} />);
+    render(
+      <MemoryRouter>
+        <Results results={[]} error="" onChangeGameId={() => {}} />
+      </MemoryRouter>
+    );
     const message = screen.getByText(/no results/i);
     expect(message).toBeInTheDocument();
   });
@@ -28,7 +35,9 @@ describe('Data display tests', () => {
       { name: 'test2', description: 'test2', id: '2' },
     ];
     render(
-      <Results results={mockResults} error="" onChangeGameId={() => {}} />
+      <MemoryRouter>
+        <Results results={mockResults} error="" onChangeGameId={() => {}} />
+      </MemoryRouter>
     );
     const items = screen.getAllByRole('listitem');
     expect(items[0]).toHaveTextContent('test: test');
@@ -38,7 +47,9 @@ describe('Data display tests', () => {
   it('handles missing or undefined data gracefully', () => {
     const mockResults = [{ id: '1' }, { id: '2' }];
     render(
-      <Results results={mockResults} error="" onChangeGameId={() => {}} />
+      <MemoryRouter>
+        <Results results={mockResults} error="" onChangeGameId={() => {}} />
+      </MemoryRouter>
     );
     const items = screen.getAllByRole('listitem');
     expect(items[0]).toHaveTextContent('No name: No description');
@@ -50,7 +61,9 @@ describe('Error handling tests', () => {
   it('displays error message when API call fails', () => {
     const mockError = 'API call failed';
     render(
-      <Results results={[]} error={mockError} onChangeGameId={() => {}} />
+      <MemoryRouter>
+        <Results results={[]} error={mockError} onChangeGameId={() => {}} />
+      </MemoryRouter>
     );
     const errorMessage = screen.getByText(mockError);
     expect(errorMessage).toBeInTheDocument();

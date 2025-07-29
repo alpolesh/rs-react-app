@@ -1,15 +1,18 @@
-import { useContext } from 'react';
-import { PaginationContext } from '@src/context/PaginationContext';
 import { getPageNumbers } from '@src/helpers';
 
 interface PaginationProps {
   itemsPerPage: number;
   totalItems: number;
+  currentPage: number;
+  handleChangePage: (page: number) => void;
 }
 
-function Pagination({ itemsPerPage, totalItems }: PaginationProps) {
-  const pagination = useContext(PaginationContext);
-  const { currentPage, handleChangePage } = pagination;
+function Pagination({
+  itemsPerPage,
+  totalItems,
+  currentPage,
+  handleChangePage,
+}: PaginationProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const pageNumbers = getPageNumbers(currentPage, totalPages);
   return (

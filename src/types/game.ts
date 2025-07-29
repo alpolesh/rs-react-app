@@ -6,5 +6,3 @@ export interface Game {
   released_date: string;
   id: string;
 }
-
-export type SelectedGameId = string | null;

@@ -1,8 +1,7 @@
-import { useContext } from 'react';
+import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
 import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
 import Pagination from '@components/pagination/Pagination';
-import { PaginationContext } from '@src/context/PaginationContext';
 
 interface SearchResult {
   name?: string;
@@ -17,12 +16,18 @@ interface ResultsProps {
 }
 
 function Results({ results, error, onChangeGameId }: ResultsProps) {
-  const pagination = useContext(PaginationContext);
-  const { currentPage } = pagination;
+  const [pageParam, setPageParamToExistedParams] =
+    useCustomSearchParams('page');
+  const currentPage = Number(pageParam || '1');
 
   const itemsPerPage = 3;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleChangePage = (page: number) => {
+    setPageParamToExistedParams(page.toString());
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 space-y-6 w-full">
       <h3 className="text-xl text-center font-semibold text-gray-800">
@@ -50,7 +55,12 @@ function Results({ results, error, onChangeGameId }: ResultsProps) {
               );
             })}
           </ul>
-          <Pagination itemsPerPage={itemsPerPage} totalItems={results.length} />
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            totalItems={results.length}
+            currentPage={currentPage}
+            handleChangePage={handleChangePage}
+          />
         </>
       )}
     </div>

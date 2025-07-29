@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ResultItem from '@components/results/ResultItem';
 
 describe('ResultItem', () => {
@@ -27,5 +28,16 @@ describe('ResultItem', () => {
     render(<ResultItem gameId={gameId} onChangeGameId={onChangeGameId} />);
     const item = screen.getByRole('listitem');
     expect(item).toHaveTextContent('No name: No description');
+  });
+
+  it('calls onChangeGameId when clicked', async () => {
+    const user = userEvent.setup();
+    const gameId = '1';
+    const onChangeGameId = vi.fn<(gameId: string) => void>();
+
+    render(<ResultItem gameId={gameId} onChangeGameId={onChangeGameId} />);
+    const item = screen.getByRole('listitem');
+    await user.click(item);
+    expect(onChangeGameId).toHaveBeenCalledWith(gameId);
   });
 });

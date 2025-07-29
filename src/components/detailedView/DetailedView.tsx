@@ -4,7 +4,7 @@ import ErrorResults from '@components/results/ErrorResults';
 interface DetailedViewProps {
   selectedGame: Game | null;
   loadGameError: string | null;
-  setSelectedGameId: (gameId: null) => void;
+  resetSelectedGameId: (gameId: string) => void;
 }
 
 function formatKey(key: string) {
@@ -14,7 +14,7 @@ function formatKey(key: string) {
 function DetailedView({
   selectedGame,
   loadGameError,
-  setSelectedGameId,
+  resetSelectedGameId,
 }: DetailedViewProps) {
   if (!selectedGame) return null;
 
@@ -27,7 +27,7 @@ function DetailedView({
     }));
 
   const handleCloseClick = () => {
-    setSelectedGameId(null);
+    resetSelectedGameId('');
   };
 
   if (loadGameError) {
