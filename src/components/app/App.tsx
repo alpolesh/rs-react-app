@@ -1,83 +1,140 @@
-import { Component } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams, Link } from 'react-router';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
-import {
-  calculateWaitTime,
-  getItemFromLocalStorage,
-  setItemToLocalStorage,
-} from '@src/helpers';
+import DetailedView from '@components/detailedView/DetailedView';
+import { calculateWaitTime } from '@src/helpers';
+import { fetchGamesByName, fetchGameById } from '@src/api/games';
+import useLocalStorage from '@src/hooks/useLocalStorage';
+import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
+import type { Game } from '@src/types/game';
 import './App.css';
 
-interface Game {
-  name: string;
-  description: string;
-  id: string;
-}
-interface AppState {
-  searchTerm: string;
-  results: Game[];
-  isLoading: boolean;
-  error: string | null;
-}
-class App extends Component {
-  state: AppState = {
-    searchTerm: getItemFromLocalStorage('searchTerm') || '',
-    results: [],
-    isLoading: false,
-    error: null,
+type SearchTerm = string;
+type Results = Game[];
+type IsLoading = boolean;
+type Error = string | null;
+
+function App() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
+    useCustomSearchParams('gameid');
+  const [searchTerm, setSearchTerm] = useLocalStorage<SearchTerm>(
+    'searchTerm',
+    ''
+  );
+  const [results, setResults] = useState<Results>([]);
+  const [isLoading, setIsLoading] = useState<IsLoading>(false);
+  const [loadResultsError, setLoadResultsError] = useState<Error>(null);
+
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  const [loadGameError, setLoadGameError] = useState<Error>(null);
+
+  const setParamToExistedParams = (key: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    setSearchParams(newParams);
   };
 
-  handleSearch = (term: string) => {
-    this.loadData(term);
+  const handleSearch = (term: string) => {
+    loadData(term);
+    setSearchTerm(term);
+    setParamToExistedParams('page', '1');
   };
 
-  loadData = (term: string) => {
-    this.setState({ isLoading: true, error: null });
+  const loadData = useCallback((term: string) => {
+    setIsLoading(true);
+    setLoadResultsError(null);
+
     const minSpinnerTime = 500;
     const startTime = Date.now();
 
-    fetch(`https://zelda.fanapis.com/api/games?name=${term}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+    fetchGamesByName(term)
       .then((data) => {
-        this.setState({
-          results: data.data,
-          searchTerm: term,
-        });
-        setItemToLocalStorage('searchTerm', term);
+        setResults(data);
       })
       .catch((error) => {
-        this.setState({ error: error.message });
+        setLoadResultsError(error.message);
       })
       .finally(() => {
         const waitTime = calculateWaitTime(minSpinnerTime, startTime);
         setTimeout(() => {
-          this.setState({ isLoading: false });
+          setIsLoading(false);
+        }, waitTime);
+      });
+  }, []);
+
+  const loadSelectedGame = (gameId: string) => {
+    setIsLoading(true);
+    setLoadGameError(null);
+
+    const minSpinnerTime = 500;
+    const startTime = Date.now();
+
+    fetchGameById(gameId)
+      .then((data) => {
+        setSelectedGame(data);
+      })
+      .catch((error) => {
+        setLoadGameError(error.message);
+      })
+      .finally(() => {
+        const waitTime = calculateWaitTime(minSpinnerTime, startTime);
+        setTimeout(() => {
+          setIsLoading(false);
         }, waitTime);
       });
   };
 
-  componentDidMount() {
-    this.loadData(this.state.searchTerm);
-  }
+  const handleChangeGameId = (gameId: string) => {
+    setSelectedGameIdToExistedParams(gameId);
+  };
 
-  render() {
-    return (
-      <div className="app-container max-w-2xl mx-auto px-4 py-4">
-        {this.state.isLoading && <Spinner />}
-        <SearchBar
-          onSearch={this.handleSearch}
-          searchTerm={this.state.searchTerm}
-        />
-        <Results results={this.state.results} error={this.state.error} />
+  useEffect(() => {
+    loadData(searchTerm);
+  }, [searchTerm, loadData]);
+
+  useEffect(() => {
+    if (selectedGameIdParam) {
+      loadSelectedGame(selectedGameIdParam);
+    }
+  }, [selectedGameIdParam]);
+
+  return (
+    <>
+      {isLoading && <Spinner />}
+      <div className="min-h-screen flex flex-col px-4 py-4">
+        <div className="flex items-center">
+          <Link to="/about">
+            <button className="bg-green-500 text-white px-4 py-2 rounded shadow">
+              About
+            </button>
+          </Link>
+          <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
+        </div>
+
+        <div className="flex flex-1 gap-4">
+          <div className="flex-1">
+            <Results
+              results={results}
+              error={loadResultsError}
+              onChangeGameId={handleChangeGameId}
+            />
+          </div>
+
+          {selectedGameIdParam && (
+            <DetailedView
+              selectedGame={selectedGame}
+              loadGameError={loadGameError}
+              resetSelectedGameId={handleChangeGameId}
+            />
+          )}
+        </div>
       </div>
-    );
-  }
+    </>
+  );
 }
 
 export default App;
