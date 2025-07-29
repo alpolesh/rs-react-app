@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router';
 import './index.css';
 import AppRoutes from './AppRoutes.tsx';
 import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary.tsx';
+import { Provider } from 'react-redux';
+import { store } from '@src/store';
 
 const container = document.getElementById('root');
 container?.classList.add('w-full');
@@ -16,7 +18,9 @@ createRoot(container).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <AppRoutes />
+        <Provider store={store}>
+          <AppRoutes />
+        </Provider>
       </BrowserRouter>
     </ErrorBoundary>
   </StrictMode>
