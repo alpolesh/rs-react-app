@@ -1,12 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-
-interface GameDetails {
-  name?: string;
-  description?: string;
-  gameId: string;
-}
-
-type SavedGamesState = Record<string, GameDetails>;
+import type { SavedGamesState } from '@src/types/store/savedGamesSlice';
 
 const savedGamesSlice = createSlice({
   name: 'savedGames',

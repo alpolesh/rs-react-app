@@ -1,8 +1,9 @@
 import App from '@components/app/App';
 import { BrowserRouter } from 'react-router';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
+import { renderWithStore } from '@src/__tests__/helpers/test-utils/mockStore';
 
 describe('App integration Tests', () => {
   beforeEach(() => {
@@ -16,10 +17,13 @@ describe('App integration Tests', () => {
       json: () => Promise.resolve({ data: [] }),
     } as Response);
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
 
     await waitFor(() => {
@@ -37,10 +41,13 @@ describe('App integration Tests', () => {
       vi.fn(() => Promise.resolve())
     );
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
 
     expect(fetch).toHaveBeenCalledWith(
@@ -59,10 +66,13 @@ describe('App integration Tests', () => {
       )
     );
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
@@ -85,10 +95,13 @@ describe('App api integration tests', () => {
       vi.fn(() => Promise.resolve())
     );
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
     const input = screen.getByPlaceholderText(/search/i);
     const button = screen.getByRole('button', { name: /search/i });
@@ -118,10 +131,13 @@ describe('App api integration tests', () => {
       )
     );
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
     await waitFor(() => {
       expect(screen.getByText(/Zelda/)).toBeInTheDocument();
@@ -135,10 +151,13 @@ describe('App api integration tests', () => {
       vi.fn().mockRejectedValue(new Error('Network Error'))
     );
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
     await waitFor(() =>
       expect(screen.getByText(/network error/i)).toBeInTheDocument()
@@ -157,10 +176,13 @@ describe('App api integration tests', () => {
       )
     );
 
-    render(
+    renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>
+      </BrowserRouter>,
+      {
+        savedGames: {},
+      }
     );
     const input = screen.getByPlaceholderText(/search/i);
     const button = screen.getByRole('button', { name: /search/i });

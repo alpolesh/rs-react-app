@@ -1,6 +1,7 @@
 import Results from '@components/results/Results';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
+import { renderWithStore } from '@src/__tests__/helpers/test-utils/mockStore';
 
 describe('Results rendering tests', () => {
   it('renders correct number of items when data is provided', () => {
@@ -8,20 +9,28 @@ describe('Results rendering tests', () => {
       { name: 'test', description: 'test', id: '1' },
       { id: '2' },
     ];
-    render(
+
+    renderWithStore(
       <MemoryRouter>
         <Results results={mockResults} error="" onChangeGameId={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        savedGames: {},
+      }
     );
+
     const items = screen.getAllByRole('listitem');
     expect(items).toHaveLength(mockResults.length);
   });
 
   it('displays "no results" message when data array is empty', () => {
-    render(
+    renderWithStore(
       <MemoryRouter>
         <Results results={[]} error="" onChangeGameId={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        savedGames: {},
+      }
     );
     const message = screen.getByText(/no results/i);
     expect(message).toBeInTheDocument();
@@ -34,10 +43,13 @@ describe('Data display tests', () => {
       { name: 'test', description: 'test', id: '1' },
       { name: 'test2', description: 'test2', id: '2' },
     ];
-    render(
+    renderWithStore(
       <MemoryRouter>
         <Results results={mockResults} error="" onChangeGameId={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        savedGames: {},
+      }
     );
     const items = screen.getAllByRole('listitem');
     expect(items[0]).toHaveTextContent('test: test');
@@ -46,10 +58,13 @@ describe('Data display tests', () => {
 
   it('handles missing or undefined data gracefully', () => {
     const mockResults = [{ id: '1' }, { id: '2' }];
-    render(
+    renderWithStore(
       <MemoryRouter>
         <Results results={mockResults} error="" onChangeGameId={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        savedGames: {},
+      }
     );
     const items = screen.getAllByRole('listitem');
     expect(items[0]).toHaveTextContent('No name: No description');
@@ -60,10 +75,13 @@ describe('Data display tests', () => {
 describe('Error handling tests', () => {
   it('displays error message when API call fails', () => {
     const mockError = 'API call failed';
-    render(
+    renderWithStore(
       <MemoryRouter>
         <Results results={[]} error={mockError} onChangeGameId={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        savedGames: {},
+      }
     );
     const errorMessage = screen.getByText(mockError);
     expect(errorMessage).toBeInTheDocument();
