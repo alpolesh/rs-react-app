@@ -30,8 +30,8 @@ function ResultItem({
     } else {
       dispatch(
         setSavedGame({
-          key: gameId,
-          details: { name, description, key: gameId },
+          gameId,
+          details: { name, description, gameId },
         })
       );
     }

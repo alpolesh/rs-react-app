@@ -115,7 +115,7 @@ function App() {
           <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
         </div>
 
-        <div className="flex flex-1 gap-4">
+        <div className="flex flex-1 gap-4 pb-16">
           <div className="flex-1">
             <Results
               results={results}

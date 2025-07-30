@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 interface GameDetails {
   name?: string;
   description?: string;
-  key: string;
+  gameId: string;
 }
 
 type SavedGamesState = Record<string, GameDetails>;
@@ -13,12 +13,12 @@ const savedGamesSlice = createSlice({
   initialState: {} as SavedGamesState,
   reducers: {
     setSavedGame: (state, action) => {
-      const { key, details } = action.payload;
-      state[key] = { ...details };
+      const { gameId, details } = action.payload;
+      state[gameId] = { ...details };
     },
     deleteSavedGame: (state, action) => {
-      const key = action.payload;
-      delete state[key];
+      const gameId = action.payload;
+      delete state[gameId];
     },
   },
 });
