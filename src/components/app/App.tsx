@@ -10,6 +10,7 @@ import useLocalStorage from '@src/hooks/useLocalStorage';
 import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
 import type { Game } from '@src/types/game';
 import './App.css';
+import ThemeChanger from '@components/themeChanger/ThemeChanger';
 
 type SearchTerm = string;
 type Results = Game[];
@@ -113,9 +114,10 @@ function App() {
             </button>
           </Link>
           <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
+          <ThemeChanger />
         </div>
 
-        <div className="flex flex-1 gap-4">
+        <div className="flex flex-1 gap-4 pb-16">
           <div className="flex-1">
             <Results
               results={results}

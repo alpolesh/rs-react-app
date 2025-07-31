@@ -3,7 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import './index.css';
 import AppRoutes from './AppRoutes.tsx';
-import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary.tsx';
+import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary';
+import { Provider } from 'react-redux';
+import { store } from '@src/store';
+import { ThemeProvider } from '@src/context/themeContext/ThemeProvider';
 
 const container = document.getElementById('root');
 container?.classList.add('w-full');
@@ -16,7 +19,11 @@ createRoot(container).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <AppRoutes />
+        <Provider store={store}>
+          <ThemeProvider>
+            <AppRoutes />
+          </ThemeProvider>
+        </Provider>
       </BrowserRouter>
     </ErrorBoundary>
   </StrictMode>
