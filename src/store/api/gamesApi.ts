@@ -13,6 +13,7 @@ export const gamesApi = createApi({
     getGamesByName: builder.query<Game[], string>({
       query: (name) => `/games?name=${name}`,
       providesTags: ['Games'],
+      transformResponse: (response: { data: Game[] }) => response.data,
     }),
 
     getGameById: builder.query<Game, string>({
@@ -20,6 +21,7 @@ export const gamesApi = createApi({
       providesTags: (_result, _error, gameId) => [
         { type: 'GameDetails', id: gameId },
       ],
+      transformResponse: (response: { data: Game }) => response.data,
     }),
   }),
 });
