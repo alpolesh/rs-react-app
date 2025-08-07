@@ -14,11 +14,17 @@ interface SearchResult {
 
 interface ResultsProps {
   results: SearchResult[];
-  error: string | null;
+  error: string | undefined;
   onChangeGameId: (gameId: string) => void;
+  refetchGames: () => void;
 }
 
-function Results({ results, error, onChangeGameId }: ResultsProps) {
+function Results({
+  results,
+  error,
+  onChangeGameId,
+  refetchGames,
+}: ResultsProps) {
   const [pageParam, setPageParamToExistedParams] =
     useCustomSearchParams('page');
   const currentPage = Number(pageParam || '1');
@@ -34,8 +40,16 @@ function Results({ results, error, onChangeGameId }: ResultsProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 w-full">
-      <h3 className="text-xl text-center font-semibold text-gray-800">
+    <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 w-full relative">
+      <button
+        onClick={refetchGames}
+        className="absolute top-4 !p-[5px] left-4 bg-purple-600"
+        aria-label="Refetch game details"
+      >
+        Refetch list
+      </button>
+
+      <h3 className="text-xl text-center font-semibold text-gray-800 mb-4">
         Search Results
       </h3>
 
