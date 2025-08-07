@@ -15,9 +15,10 @@ describe('DetailedView', () => {
   it('renders nothing if selectedGame is null', () => {
     const { container } = render(
       <DetailedView
-        selectedGame={null}
-        loadGameError={null}
+        selectedGame={undefined}
+        loadGameError={undefined}
         resetSelectedGameId={vi.fn()}
+        refetchSelectedGame={vi.fn()}
       />
     );
     expect(container.firstChild).toBeNull();
@@ -29,6 +30,7 @@ describe('DetailedView', () => {
         selectedGame={mockGame}
         loadGameError="Failed to load"
         resetSelectedGameId={vi.fn()}
+        refetchSelectedGame={vi.fn()}
       />
     );
     expect(screen.getByText(/Failed to load/i)).toBeInTheDocument();
@@ -38,8 +40,9 @@ describe('DetailedView', () => {
     render(
       <DetailedView
         selectedGame={mockGame}
-        loadGameError={null}
+        loadGameError={undefined}
         resetSelectedGameId={vi.fn()}
+        refetchSelectedGame={vi.fn()}
       />
     );
 

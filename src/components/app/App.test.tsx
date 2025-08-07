@@ -1,144 +1,104 @@
-import App from '@components/app/App';
-import { BrowserRouter } from 'react-router';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { setupServer } from 'msw/node';
+import { http, HttpResponse, delay } from 'msw';
+import App from '@components/app/App';
 import { renderWithStore } from '@src/__tests__/helpers/test-utils/mockStore';
+import { BrowserRouter } from 'react-router';
 
-describe('App integration Tests', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.restoreAllMocks();
-  });
+const server = setupServer();
 
-  it('makes initial API call on component mount', async () => {
-    const mockedFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    } as Response);
+beforeAll(() => server.listen());
+afterEach(() => {
+  server.resetHandlers();
+  vi.restoreAllMocks();
+  localStorage.clear();
+});
+afterAll(() => server.close());
 
-    renderWithStore(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
-    );
-
-    await waitFor(() => {
-      expect(mockedFetch).toHaveBeenCalled();
-    });
-  });
-
-  it('handles search term from localStorage on initial load', () => {
+describe('App Integration Tests', () => {
+  it('handles search term from localStorage on initial load', async () => {
     const mockedSearchTerm = 'Zelda';
     vi.spyOn(window.localStorage.__proto__, 'getItem').mockReturnValue(
       JSON.stringify(mockedSearchTerm)
     );
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() => Promise.resolve())
+
+    server.use(
+      http.get('https://zelda.fanapis.com/api/games', ({ request }) => {
+        const url = new URL(request.url);
+        const name = url.searchParams.get('name');
+        if (name === mockedSearchTerm) {
+          return HttpResponse.json({
+            data: [{ id: '1', name: mockedSearchTerm, description: 'desc' }],
+          });
+        }
+      })
     );
 
     renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
+      </BrowserRouter>
     );
-
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(mockedSearchTerm)
-    );
-  });
-
-  it('manages loading states during API calls', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ data: [] }),
-        } as Response)
-      )
-    );
-
-    renderWithStore(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
-    );
-    const spinner = screen.getByRole('status');
-    expect(spinner).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(spinner).not.toBeInTheDocument();
+      expect(screen.getByText(mockedSearchTerm)).toBeInTheDocument();
     });
   });
-});
 
-describe('App api integration tests', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.restoreAllMocks();
-  });
-
-  it('calls API with correct parametres', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() => Promise.resolve())
+  it('displays loading spinner during API calls', async () => {
+    server.use(
+      http.get('https://zelda.fanapis.com/api/games', async () => {
+        await delay(150);
+        return HttpResponse.json({ data: [{ id: '1', name: 'Slow Game' }] });
+      })
     );
 
+    const user = userEvent.setup();
     renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
+      </BrowserRouter>
     );
-    const input = screen.getByPlaceholderText(/search/i);
-    const button = screen.getByRole('button', { name: /search/i });
 
-    await userEvent.type(input, 'Link');
-    await userEvent.click(button);
+    const input = screen.getByPlaceholderText(/search/i);
+    const searchButton = screen.getByRole('button', { name: /search/i });
+    await user.type(input, 'slow');
+    user.click(searchButton);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('Link'));
+      expect(screen.getByRole('status')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(screen.getByText('Slow Game')).toBeInTheDocument();
     });
   });
 
   it('updates state and renders results on success', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              data: [
-                { id: '1', name: 'Zelda', description: 'Adventure' },
-                { id: '2', name: 'Link', description: 'Hero' },
-              ],
-            }),
-        } as Response)
-      )
+    server.use(
+      http.get('https://zelda.fanapis.com/api/games', () => {
+        return HttpResponse.json({
+          data: [
+            { id: '1', name: 'Zelda', description: 'Adventure' },
+            { id: '2', name: 'Link', description: 'Hero' },
+          ],
+        });
+      })
     );
 
+    const user = userEvent.setup();
     renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
+      </BrowserRouter>
     );
+
+    const input = screen.getByPlaceholderText(/search/i);
+    const searchButton = screen.getByRole('button', { name: /search/i });
+    await user.type(input, 'any_search');
+    await user.click(searchButton);
+
     await waitFor(() => {
       expect(screen.getByText(/Zelda/)).toBeInTheDocument();
       expect(screen.getByText(/Link/)).toBeInTheDocument();
@@ -146,56 +106,99 @@ describe('App api integration tests', () => {
   });
 
   it('displays error message when API call fails', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockRejectedValue(new Error('Network Error'))
+    server.use(
+      http.get('https://zelda.fanapis.com/api/games', () => {
+        return new HttpResponse(
+          JSON.stringify({ message: 'error has occurred' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      })
     );
 
+    const user = userEvent.setup();
     renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
+      </BrowserRouter>
     );
+
+    const input = screen.getByPlaceholderText(/search/i);
+    const searchButton = screen.getByRole('button', { name: /search/i });
+    await user.type(input, 'error_case');
+    await user.click(searchButton);
+
     await waitFor(() =>
-      expect(screen.getByText(/network error/i)).toBeInTheDocument()
+      expect(screen.getByText(/error has occurred/i)).toBeInTheDocument()
     );
   });
 
   it('saves new search term to localStorage after search', async () => {
-    vi.spyOn(window.localStorage.__proto__, 'setItem').mockReturnValue(vi.fn());
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ data: [] }),
-        } as Response)
-      )
+    server.use(
+      http.get('https://zelda.fanapis.com/api/games', () => {
+        return HttpResponse.json({ data: [] });
+      })
     );
 
+    vi.spyOn(window.localStorage.__proto__, 'setItem').mockReturnValue(vi.fn());
+    const user = userEvent.setup();
     renderWithStore(
       <BrowserRouter>
         <App />
-      </BrowserRouter>,
-      {
-        savedGames: {},
-      }
+      </BrowserRouter>
     );
+
     const input = screen.getByPlaceholderText(/search/i);
     const button = screen.getByRole('button', { name: /search/i });
 
-    await userEvent.clear(input);
-    await userEvent.type(input, 'Wind Waker');
-    await userEvent.click(button);
+    await user.type(input, 'Wind Waker');
+    await user.click(button);
 
     await waitFor(() => {
       expect(localStorage.setItem).toHaveBeenCalledWith(
         'searchTerm',
         JSON.stringify('Wind Waker')
       );
+    });
+  });
+
+  it('should use cached data on the second identical search', async () => {
+    vi.spyOn(window.localStorage.__proto__, 'getItem').mockReturnValue(
+      JSON.stringify('zelda')
+    );
+
+    server.use(
+      http.get('https://zelda.fanapis.com/api/games', () => {
+        return HttpResponse.json({
+          data: [{ id: '1', name: 'Test Game: The Legend of Zelda' }],
+        });
+      })
+    );
+
+    const fetchSpy = vi.spyOn(global, 'fetch');
+    const user = userEvent.setup();
+
+    renderWithStore(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
+
+    const input = screen.getByPlaceholderText(/search/i);
+    const searchButton = screen.getByRole('button', { name: /search/i });
+    await user.clear(input);
+    await user.type(input, 'zelda');
+    await user.click(searchButton);
+
+    await screen.findByText(/Test Game: The Legend of Zelda/i);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    await user.click(searchButton);
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
