@@ -2,8 +2,8 @@ import type { Game } from '@src/types/game';
 import ErrorResults from '@components/results/ErrorResults';
 
 interface DetailedViewProps {
-  selectedGame: Game | undefined;
-  loadGameError: string | undefined;
+  selectedGame?: Game;
+  loadGameError?: string;
   resetSelectedGameId: (gameId: string) => void;
   refetchSelectedGame: () => void;
 }
