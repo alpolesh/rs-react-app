@@ -12,7 +12,12 @@ describe('Results rendering tests', () => {
 
     renderWithStore(
       <MemoryRouter>
-        <Results results={mockResults} error="" onChangeGameId={() => {}} />
+        <Results
+          results={mockResults}
+          error=""
+          onChangeGameId={() => {}}
+          refetchGames={vi.fn()}
+        />
       </MemoryRouter>,
       {
         savedGames: {},
@@ -26,7 +31,12 @@ describe('Results rendering tests', () => {
   it('displays "no results" message when data array is empty', () => {
     renderWithStore(
       <MemoryRouter>
-        <Results results={[]} error="" onChangeGameId={() => {}} />
+        <Results
+          results={[]}
+          error=""
+          onChangeGameId={() => {}}
+          refetchGames={vi.fn()}
+        />
       </MemoryRouter>,
       {
         savedGames: {},
@@ -45,7 +55,12 @@ describe('Data display tests', () => {
     ];
     renderWithStore(
       <MemoryRouter>
-        <Results results={mockResults} error="" onChangeGameId={() => {}} />
+        <Results
+          results={mockResults}
+          error=""
+          onChangeGameId={() => {}}
+          refetchGames={vi.fn()}
+        />
       </MemoryRouter>,
       {
         savedGames: {},
@@ -60,7 +75,12 @@ describe('Data display tests', () => {
     const mockResults = [{ id: '1' }, { id: '2' }];
     renderWithStore(
       <MemoryRouter>
-        <Results results={mockResults} error="" onChangeGameId={() => {}} />
+        <Results
+          results={mockResults}
+          error=""
+          onChangeGameId={() => {}}
+          refetchGames={vi.fn()}
+        />
       </MemoryRouter>,
       {
         savedGames: {},
@@ -77,7 +97,12 @@ describe('Error handling tests', () => {
     const mockError = 'API call failed';
     renderWithStore(
       <MemoryRouter>
-        <Results results={[]} error={mockError} onChangeGameId={() => {}} />
+        <Results
+          results={[]}
+          error={mockError}
+          onChangeGameId={() => {}}
+          refetchGames={vi.fn()}
+        />
       </MemoryRouter>,
       {
         savedGames: {},

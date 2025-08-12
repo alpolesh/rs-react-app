@@ -1,4 +1,4 @@
-import { getPageNumbers } from '@src/helpers';
+import { getPageNumbers } from '@src/helpers/helpers';
 
 describe('getPageNumbers', () => {
   it('returns all pages when totalPages <= maxVisible', () => {

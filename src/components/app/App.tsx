@@ -1,21 +1,19 @@
-import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router';
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
 import DetailedView from '@components/detailedView/DetailedView';
-import { calculateWaitTime } from '@src/helpers';
-import { fetchGamesByName, fetchGameById } from '@src/api/games';
+import getErrorMessage from '@src/helpers/getErrorMessage';
 import useLocalStorage from '@src/hooks/useLocalStorage';
 import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
-import type { Game } from '@src/types/game';
+import {
+  useGetGamesByNameQuery,
+  useGetGameByIdQuery,
+} from '@src/store/api/gamesApi';
 import './App.css';
 import ThemeChanger from '@components/themeChanger/ThemeChanger';
 
 type SearchTerm = string;
-type Results = Game[];
-type IsLoading = boolean;
-type Error = string | null;
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,12 +24,6 @@ function App() {
     'searchTerm',
     ''
   );
-  const [results, setResults] = useState<Results>([]);
-  const [isLoading, setIsLoading] = useState<IsLoading>(false);
-  const [loadResultsError, setLoadResultsError] = useState<Error>(null);
-
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [loadGameError, setLoadGameError] = useState<Error>(null);
 
   const setParamToExistedParams = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -40,68 +32,31 @@ function App() {
   };
 
   const handleSearch = (term: string) => {
-    loadData(term);
     setSearchTerm(term);
     setParamToExistedParams('page', '1');
-  };
-
-  const loadData = useCallback((term: string) => {
-    setIsLoading(true);
-    setLoadResultsError(null);
-
-    const minSpinnerTime = 500;
-    const startTime = Date.now();
-
-    fetchGamesByName(term)
-      .then((data) => {
-        setResults(data);
-      })
-      .catch((error) => {
-        setLoadResultsError(error.message);
-      })
-      .finally(() => {
-        const waitTime = calculateWaitTime(minSpinnerTime, startTime);
-        setTimeout(() => {
-          setIsLoading(false);
-        }, waitTime);
-      });
-  }, []);
-
-  const loadSelectedGame = (gameId: string) => {
-    setIsLoading(true);
-    setLoadGameError(null);
-
-    const minSpinnerTime = 500;
-    const startTime = Date.now();
-
-    fetchGameById(gameId)
-      .then((data) => {
-        setSelectedGame(data);
-      })
-      .catch((error) => {
-        setLoadGameError(error.message);
-      })
-      .finally(() => {
-        const waitTime = calculateWaitTime(minSpinnerTime, startTime);
-        setTimeout(() => {
-          setIsLoading(false);
-        }, waitTime);
-      });
   };
 
   const handleChangeGameId = (gameId: string) => {
     setSelectedGameIdToExistedParams(gameId);
   };
 
-  useEffect(() => {
-    loadData(searchTerm);
-  }, [searchTerm, loadData]);
+  const {
+    data: games = [],
+    error: gamesError,
+    isFetching: isGamesFetching,
+    refetch: refetchGames,
+  } = useGetGamesByNameQuery(searchTerm);
 
-  useEffect(() => {
-    if (selectedGameIdParam) {
-      loadSelectedGame(selectedGameIdParam);
-    }
-  }, [selectedGameIdParam]);
+  const {
+    data: selectedGame,
+    error: selectedGameError,
+    isFetching: isGameFetching,
+    refetch: refetchSelectedGame,
+  } = useGetGameByIdQuery(selectedGameIdParam, {
+    skip: !selectedGameIdParam,
+  });
+
+  const isLoading = isGamesFetching || isGameFetching;
 
   return (
     <>
@@ -120,17 +75,19 @@ function App() {
         <div className="flex flex-1 gap-4 pb-16">
           <div className="flex-1">
             <Results
-              results={results}
-              error={loadResultsError}
+              results={games}
+              error={getErrorMessage(gamesError)}
               onChangeGameId={handleChangeGameId}
+              refetchGames={refetchGames}
             />
           </div>
 
           {selectedGameIdParam && (
             <DetailedView
               selectedGame={selectedGame}
-              loadGameError={loadGameError}
+              loadGameError={getErrorMessage(selectedGameError)}
               resetSelectedGameId={handleChangeGameId}
+              refetchSelectedGame={refetchSelectedGame}
             />
           )}
         </div>
