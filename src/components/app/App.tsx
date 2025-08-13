@@ -1,4 +1,6 @@
-import { useSearchParams, Link } from 'react-router';
+import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 import SearchBar from '@components/searchbar/Searchbar';
 import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
@@ -16,10 +18,12 @@ import ThemeChanger from '@components/themeChanger/ThemeChanger';
 type SearchTerm = string;
 
 function App() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  // const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
-    useCustomSearchParams('gameid');
+  // const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
+  //   useCustomSearchParams('gameid');
   const [searchTerm, setSearchTerm] = useLocalStorage<SearchTerm>(
     'searchTerm',
     ''
@@ -28,7 +32,7 @@ function App() {
   const setParamToExistedParams = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set(key, value);
-    setSearchParams(newParams);
+    router.push(`?${newParams.toString()}`);
   };
 
   const handleSearch = (term: string) => {
@@ -37,7 +41,7 @@ function App() {
   };
 
   const handleChangeGameId = (gameId: string) => {
-    setSelectedGameIdToExistedParams(gameId);
+    // setSelectedGameIdToExistedParams(gameId);
   };
 
   const {
@@ -47,23 +51,24 @@ function App() {
     refetch: refetchGames,
   } = useGetGamesByNameQuery(searchTerm);
 
-  const {
-    data: selectedGame,
-    error: selectedGameError,
-    isFetching: isGameFetching,
-    refetch: refetchSelectedGame,
-  } = useGetGameByIdQuery(selectedGameIdParam, {
-    skip: !selectedGameIdParam,
-  });
+  // const {
+  //   data: selectedGame,
+  //   error: selectedGameError,
+  //   isFetching: isGameFetching,
+  //   refetch: refetchSelectedGame,
+  // } = useGetGameByIdQuery(selectedGameIdParam, {
+  //   skip: !selectedGameIdParam,
+  // });
 
-  const isLoading = isGamesFetching || isGameFetching;
+  // const isLoading = isGamesFetching || isGameFetching;
+  const isLoading = isGamesFetching;
 
   return (
     <>
       {isLoading && <Spinner />}
       <div className="min-h-screen flex flex-col px-4 py-4">
         <div className="flex items-center">
-          <Link to="/about">
+          <Link href="/about">
             <button className="bg-green-500 text-white px-4 py-2 rounded shadow">
               About
             </button>
@@ -82,14 +87,14 @@ function App() {
             />
           </div>
 
-          {selectedGameIdParam && (
+          {/* {selectedGameIdParam && (
             <DetailedView
               selectedGame={selectedGame}
               loadGameError={getErrorMessage(selectedGameError)}
               resetSelectedGameId={handleChangeGameId}
               refetchSelectedGame={refetchSelectedGame}
             />
-          )}
+          )} */}
         </div>
       </div>
     </>
