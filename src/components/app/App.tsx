@@ -18,12 +18,11 @@ import ThemeChanger from '@components/themeChanger/ThemeChanger';
 type SearchTerm = string;
 
 function App() {
-  // const [searchParams, setSearchParams] = useSearchParams();
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
-  //   useCustomSearchParams('gameid');
+  const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
+    useCustomSearchParams('gameid');
   const [searchTerm, setSearchTerm] = useLocalStorage<SearchTerm>(
     'searchTerm',
     ''
@@ -41,7 +40,7 @@ function App() {
   };
 
   const handleChangeGameId = (gameId: string) => {
-    // setSelectedGameIdToExistedParams(gameId);
+    setSelectedGameIdToExistedParams(gameId);
   };
 
   const {
@@ -51,17 +50,16 @@ function App() {
     refetch: refetchGames,
   } = useGetGamesByNameQuery(searchTerm);
 
-  // const {
-  //   data: selectedGame,
-  //   error: selectedGameError,
-  //   isFetching: isGameFetching,
-  //   refetch: refetchSelectedGame,
-  // } = useGetGameByIdQuery(selectedGameIdParam, {
-  //   skip: !selectedGameIdParam,
-  // });
+  const {
+    data: selectedGame,
+    error: selectedGameError,
+    isFetching: isGameFetching,
+    refetch: refetchSelectedGame,
+  } = useGetGameByIdQuery(selectedGameIdParam, {
+    skip: !selectedGameIdParam,
+  });
 
-  // const isLoading = isGamesFetching || isGameFetching;
-  const isLoading = isGamesFetching;
+  const isLoading = isGamesFetching || isGameFetching;
 
   return (
     <>
@@ -87,14 +85,14 @@ function App() {
             />
           </div>
 
-          {/* {selectedGameIdParam && (
+          {selectedGameIdParam && (
             <DetailedView
               selectedGame={selectedGame}
               loadGameError={getErrorMessage(selectedGameError)}
               resetSelectedGameId={handleChangeGameId}
               refetchSelectedGame={refetchSelectedGame}
             />
-          )} */}
+          )}
         </div>
       </div>
     </>
