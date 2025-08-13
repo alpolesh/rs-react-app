@@ -1,5 +1,5 @@
 interface ErrorResultsProps {
-  error: string;
+  error?: string;
 }
 
 function ErrorResults({ error }: ErrorResultsProps) {

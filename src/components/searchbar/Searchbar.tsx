@@ -1,19 +1,40 @@
 import { useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '@src/store';
+import { setSearchTerm } from '@src/store/slices/searchTermSlice';
+import useLocalStorage from '@src/hooks/useLocalStorage';
 
-interface SearchbarProps {
-  onSearch: (term: string) => void;
-  searchTerm: string;
-}
+type SearchTerm = string;
 
-function Searchbar({ searchTerm, onSearch }: SearchbarProps) {
+function Searchbar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchTerm = useSelector((state: RootState) => state.searchTerm);
+  const dispatch = useDispatch();
+
   const [inputValue, setInputValue] = useState(searchTerm || '');
+
+  const [, setSearchTermToLocalStorage] = useLocalStorage<SearchTerm>(
+    'searchTerm',
+    ''
+  );
+
+  const setParamToExistedParams = (key: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    router.push(`?${newParams.toString()}`);
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
 
   const handleSearchClick = () => {
-    onSearch(inputValue.trim());
+    const term = inputValue.trim();
+    dispatch(setSearchTerm(term));
+    setSearchTermToLocalStorage(term);
+    setParamToExistedParams('page', '1');
     setInputValue((prevState) => prevState.trim());
   };
 

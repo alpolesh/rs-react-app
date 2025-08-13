@@ -1,9 +1,5 @@
-import { ClientOnly } from './client';
-
-export function generateStaticParams() {
-  return [{ slug: [''] }];
-}
+import App from '@components/app/App';
 
 export default function Page() {
-  return <ClientOnly />;
+  return <App />;
 }

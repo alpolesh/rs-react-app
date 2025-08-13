@@ -4,17 +4,16 @@ import {
   setSavedGame,
   deleteSavedGame,
 } from '@src/store/slices/savedGamesSlice';
+import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
 
 interface ResultItemProps {
   gameId: string;
-  onChangeGameId: (gameId: string) => void;
   name?: string;
   description?: string;
 }
 
 function ResultItem({
   gameId,
-  onChangeGameId,
   name = 'No name',
   description = 'No description',
 }: ResultItemProps) {
@@ -22,6 +21,12 @@ function ResultItem({
   const isChecked = useSelector(
     (state: RootState) => !!state.savedGames[gameId]
   );
+
+  const [, setSelectedGameIdToExistedParams] = useCustomSearchParams('gameid');
+
+  const handleItemClick = () => {
+    setSelectedGameIdToExistedParams(gameId);
+  };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
@@ -39,7 +44,7 @@ function ResultItem({
   return (
     <li
       className="flex items-start gap-2 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition cursor-pointer"
-      onClick={() => onChangeGameId(gameId)}
+      onClick={handleItemClick}
     >
       <input
         type="checkbox"

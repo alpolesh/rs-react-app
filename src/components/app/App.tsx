@@ -1,4 +1,5 @@
-import { useSearchParams, useRouter } from 'next/navigation';
+'use client';
+
 import Link from 'next/link';
 
 import SearchBar from '@components/searchbar/Searchbar';
@@ -6,49 +7,18 @@ import Results from '@components/results/Results';
 import Spinner from '@components/spinner/Spinner';
 import DetailedView from '@components/detailedView/DetailedView';
 import getErrorMessage from '@src/helpers/getErrorMessage';
-import useLocalStorage from '@src/hooks/useLocalStorage';
 import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
-import {
-  useGetGamesByNameQuery,
-  useGetGameByIdQuery,
-} from '@src/store/api/gamesApi';
+import { useGetGameByIdQuery } from '@src/store/api/gamesApi';
 import './App.css';
 import ThemeChanger from '@components/themeChanger/ThemeChanger';
 
-type SearchTerm = string;
-
 function App() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
     useCustomSearchParams('gameid');
-  const [searchTerm, setSearchTerm] = useLocalStorage<SearchTerm>(
-    'searchTerm',
-    ''
-  );
-
-  const setParamToExistedParams = (key: string, value: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set(key, value);
-    router.push(`?${newParams.toString()}`);
-  };
-
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setParamToExistedParams('page', '1');
-  };
 
   const handleChangeGameId = (gameId: string) => {
     setSelectedGameIdToExistedParams(gameId);
   };
-
-  const {
-    data: games = [],
-    error: gamesError,
-    isFetching: isGamesFetching,
-    refetch: refetchGames,
-  } = useGetGamesByNameQuery(searchTerm);
 
   const {
     data: selectedGame,
@@ -59,7 +29,7 @@ function App() {
     skip: !selectedGameIdParam,
   });
 
-  const isLoading = isGamesFetching || isGameFetching;
+  const isLoading = isGameFetching;
 
   return (
     <>
@@ -71,18 +41,13 @@ function App() {
               About
             </button>
           </Link>
-          <SearchBar onSearch={handleSearch} searchTerm={searchTerm} />
+          <SearchBar />
           <ThemeChanger />
         </div>
 
         <div className="flex flex-1 gap-4 pb-16">
           <div className="flex-1">
-            <Results
-              results={games}
-              error={getErrorMessage(gamesError)}
-              onChangeGameId={handleChangeGameId}
-              refetchGames={refetchGames}
-            />
+            <Results />
           </div>
 
           {selectedGameIdParam && (
