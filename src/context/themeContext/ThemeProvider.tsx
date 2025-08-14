@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { ThemeContext } from './ThemeContext';
@@ -8,7 +10,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={theme === 'dark' ? 'theme-dark' : ''}>{children}</div>
+      <div className={`${theme === 'dark' ? 'theme-dark' : ''} w-full`}>
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 }
