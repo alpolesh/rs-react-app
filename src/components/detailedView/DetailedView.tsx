@@ -1,25 +1,27 @@
-import type { Game } from '@src/types/game';
+import getErrorMessage from '@src/helpers/getErrorMessage';
+import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
+import { useGetGameByIdQuery } from '@src/store/api/gamesApi';
 import ErrorResults from '@components/results/ErrorResults';
 import DetailedCard from '@components/detailedView/DetailedCard';
 import CloseIcon from '@src/icons/close.svg?react';
-
-interface DetailedViewProps {
-  selectedGame?: Game;
-  loadGameError?: string;
-  resetSelectedGameId: (gameId: string) => void;
-  refetchSelectedGame: () => void;
-}
 
 function formatKey(key: string) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function DetailedView({
-  selectedGame,
-  loadGameError,
-  resetSelectedGameId,
-  refetchSelectedGame,
-}: DetailedViewProps) {
+function DetailedView() {
+  const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
+    useCustomSearchParams('gameid');
+
+  const {
+    data: selectedGame,
+    error: selectedGameError,
+    isFetching: isGameFetching,
+    refetch: refetchSelectedGame,
+  } = useGetGameByIdQuery(selectedGameIdParam, {
+    skip: !selectedGameIdParam,
+  });
+
   if (!selectedGame) return null;
 
   const entries = Object.entries(selectedGame)
@@ -31,19 +33,19 @@ function DetailedView({
     }));
 
   const handleCloseClick = () => {
-    resetSelectedGameId('');
+    setSelectedGameIdToExistedParams('');
   };
 
-  if (loadGameError) {
+  if (selectedGameError) {
     return (
-      <DetailedCard>
-        <ErrorResults error={loadGameError} />
+      <DetailedCard isGameFetching={isGameFetching}>
+        <ErrorResults error={getErrorMessage(selectedGameError)} />
       </DetailedCard>
     );
   }
 
   return (
-    <DetailedCard>
+    <DetailedCard isGameFetching={isGameFetching}>
       <button
         onClick={handleCloseClick}
         className="absolute top-4 !p-[5px] right-4 bg-black"
