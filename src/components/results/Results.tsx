@@ -7,8 +7,10 @@ import ResultsWrapper from '@components/results/ResultsWrapper';
 import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
 import Pagination from '@components/pagination/Pagination';
+import { useTranslations } from 'next-intl';
 
 function Results() {
+  const t = useTranslations('Results');
   const [pageParam, setPageParamToExistedParams] =
     useCustomSearchParams('page');
   const currentPage = Number(pageParam || '1');
@@ -49,7 +51,7 @@ function Results() {
         refetchGames={refetchGames}
         isGamesFetching={isGamesFetching}
       >
-        <p className="text-gray-500 italic">No results found.</p>
+        <p className="text-gray-500 italic">{t('noResults')}</p>
       </ResultsWrapper>
     );
   }

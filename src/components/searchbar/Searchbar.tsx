@@ -6,10 +6,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@src/store';
 import { setSearchTerm } from '@src/store/slices/searchTermSlice';
 import useLocalStorage from '@src/hooks/useLocalStorage';
+import { useTranslations } from 'next-intl';
 
 type SearchTerm = string;
 
 function Searchbar() {
+  const t = useTranslations('Searchbar');
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchTerm = useSelector((state: RootState) => state.searchTerm);
@@ -50,7 +52,7 @@ function Searchbar() {
         placeholder="Search..."
       />
       <button onClick={handleSearchClick} className="bg-black">
-        Search
+        {t('searchButton')}
       </button>
     </div>
   );

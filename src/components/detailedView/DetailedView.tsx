@@ -4,12 +4,14 @@ import { useGetGameByIdQuery } from '@src/store/api/gamesApi';
 import ErrorResults from '@components/results/ErrorResults';
 import DetailedCard from '@components/detailedView/DetailedCard';
 import CloseIcon from '@src/icons/close.svg?react';
+import { useTranslations } from 'next-intl';
 
 function formatKey(key: string) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function DetailedView() {
+  const t = useTranslations('DetailedView');
   const [selectedGameIdParam, setSelectedGameIdToExistedParams] =
     useCustomSearchParams('gameid');
 
@@ -59,11 +61,11 @@ function DetailedView() {
         className="absolute top-4 !p-[5px] left-4 bg-purple-600"
         aria-label="Refetch game details"
       >
-        Refetch game
+        {t('refetchButton')}
       </button>
 
       <h3 className="text-xl text-center font-semibold text-gray-800">
-        Detailed view
+        {t('title')}
       </h3>
       {entries.map(({ key, label, value }) => (
         <div key={key}>

@@ -1,4 +1,5 @@
 import { getPageNumbers } from '@src/helpers/helpers';
+import { useTranslations } from 'next-intl';
 
 interface PaginationProps {
   itemsPerPage: number;
@@ -13,6 +14,8 @@ function Pagination({
   currentPage,
   handleChangePage,
 }: PaginationProps) {
+  const t = useTranslations('Pagination');
+
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const pageNumbers = getPageNumbers(currentPage, totalPages);
   return (
@@ -25,7 +28,7 @@ function Pagination({
         disabled={currentPage === 1}
         className="px-3 py-1 bg-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:pointer-events-none"
       >
-        Prev
+        {t('prev')}
       </button>
 
       {pageNumbers.map((page) =>
@@ -56,7 +59,7 @@ function Pagination({
         disabled={currentPage === totalPages}
         className="px-3 py-1 bg-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:pointer-events-none"
       >
-        Next
+        {t('next')}
       </button>
     </nav>
   );

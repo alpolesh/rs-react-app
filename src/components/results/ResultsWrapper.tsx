@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@src/store';
 import FlyoutBar from '@components/flyoutbar/FlyoutBar';
 import Spinner from '@components/spinner/Spinner';
+import { useTranslations } from 'next-intl';
 
 interface ResultsWrapperProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ function ResultsWrapper({
   refetchGames,
   isGamesFetching,
 }: ResultsWrapperProps) {
+  const t = useTranslations('Results');
   const savedGames = useSelector((state: RootState) => state.savedGames);
   return (
     <>
@@ -24,11 +26,11 @@ function ResultsWrapper({
           className="absolute top-4 !p-[5px] left-4 bg-purple-600"
           aria-label="Refetch game details"
         >
-          Refetch list
+          {t('refetchButton')}
         </button>
 
         <h3 className="text-xl text-center font-semibold text-gray-800 mb-4">
-          Search Results
+          {t('title')}
         </h3>
         {children}
         {Object.keys(savedGames).length > 0 && <FlyoutBar />}
