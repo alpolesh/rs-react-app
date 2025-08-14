@@ -1,6 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Pagination from '@components/pagination/Pagination';
+import { NextIntlClientProvider } from 'next-intl';
+
+const messages = {
+  Pagination: {
+    prev: 'Prev',
+    next: 'Next',
+  },
+};
+
+const renderWithIntl = (ui: React.ReactElement) =>
+  render(
+    <NextIntlClientProvider locale="en" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
 
 describe('Pagination component', () => {
   const setup = (
@@ -9,7 +24,7 @@ describe('Pagination component', () => {
     currentPage: number,
     handleChangePage = vi.fn()
   ) => {
-    render(
+    renderWithIntl(
       <Pagination
         itemsPerPage={itemsPerPage}
         totalItems={totalPages}

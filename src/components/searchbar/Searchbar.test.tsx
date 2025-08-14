@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import searchTermReducer from '@src/store/slices/searchTermSlice';
+import { NextIntlClientProvider } from 'next-intl';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -17,18 +18,30 @@ vi.mock('@src/hooks/useLocalStorage', () => ({
   default: () => [vi.fn(), vi.fn()],
 }));
 
-function renderWithStore(ui: React.ReactElement) {
+const messages = {
+  Searchbar: {
+    searchButton: 'Поиск',
+  },
+};
+
+function renderWithStoreAndIntl(ui: React.ReactElement) {
   const store = configureStore({
     reducer: { searchTerm: searchTermReducer },
     preloadedState: { searchTerm: '' },
   });
 
-  return render(<Provider store={store}>{ui}</Provider>);
+  return render(
+    <Provider store={store}>
+      <NextIntlClientProvider locale="ru" messages={messages}>
+        {ui}
+      </NextIntlClientProvider>
+    </Provider>
+  );
 }
 
 describe('Searchbar rendering tests', () => {
   it('should render the search bar', () => {
-    renderWithStore(<Searchbar />);
+    renderWithStoreAndIntl(<Searchbar />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
@@ -38,7 +51,7 @@ describe('Searchbar rendering tests', () => {
       reducer: { searchTerm: searchTermReducer },
       preloadedState: { searchTerm: 'Zelda' },
     });
-    render(
+    renderWithStoreAndIntl(
       <Provider store={store}>
         <Searchbar />
       </Provider>
@@ -47,7 +60,7 @@ describe('Searchbar rendering tests', () => {
   });
 
   it('shows empty input when no saved term exists', () => {
-    renderWithStore(<Searchbar />);
+    renderWithStoreAndIntl(<Searchbar />);
     expect(screen.getByRole('textbox')).toHaveValue('');
   });
 });
@@ -55,7 +68,7 @@ describe('Searchbar rendering tests', () => {
 describe('Searchbar user interaction tests', () => {
   it('should update input value when typing', async () => {
     const user = userEvent.setup();
-    renderWithStore(<Searchbar />);
+    renderWithStoreAndIntl(<Searchbar />);
     const input = screen.getByRole('textbox');
     await user.type(input, 'Zelda');
     expect(input).toHaveValue('Zelda');
@@ -63,7 +76,7 @@ describe('Searchbar user interaction tests', () => {
 
   it('saves search term to store when search button is clicked', async () => {
     const user = userEvent.setup();
-    renderWithStore(<Searchbar />);
+    renderWithStoreAndIntl(<Searchbar />);
     const input = screen.getByRole('textbox');
     const button = screen.getByRole('button');
     await user.type(input, 'Zelda');
@@ -73,7 +86,7 @@ describe('Searchbar user interaction tests', () => {
 
   it('trims whitespace from search input before saving', async () => {
     const user = userEvent.setup();
-    renderWithStore(<Searchbar />);
+    renderWithStoreAndIntl(<Searchbar />);
     const input = screen.getByRole('textbox');
     const button = screen.getByRole('button');
     await user.type(input, '  Zelda  ');

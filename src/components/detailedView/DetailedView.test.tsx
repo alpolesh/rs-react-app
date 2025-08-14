@@ -4,9 +4,18 @@ import DetailedView from './DetailedView';
 import { useGetGameByIdQuery } from '@src/store/api/gamesApi';
 import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
 import type { Game } from '@src/types/game';
+import { NextIntlClientProvider } from 'next-intl';
 
 vi.mock('@src/hooks/useCustomSearchParams');
 vi.mock('@src/store/api/gamesApi');
+
+const mockMessages = {
+  DetailedView: {
+    id: 'Id',
+    name: 'Name',
+    released_date: 'Released',
+  },
+};
 
 const mockGame: Game = {
   id: '123',
@@ -29,6 +38,14 @@ describe('DetailedView', () => {
     ).mockReturnValue(['123', mockSetSearchParam]);
   });
 
+  function renderWithIntl() {
+    return render(
+      <NextIntlClientProvider locale="en" messages={mockMessages}>
+        <DetailedView />
+      </NextIntlClientProvider>
+    );
+  }
+
   it('renders nothing if no selectedGame', () => {
     (
       useGetGameByIdQuery as MockedFunction<typeof useGetGameByIdQuery>
@@ -39,7 +56,7 @@ describe('DetailedView', () => {
       refetch: mockRefetch,
     });
 
-    const { container } = render(<DetailedView />);
+    const { container } = renderWithIntl();
     expect(container.firstChild).toBeNull();
   });
 
@@ -53,7 +70,7 @@ describe('DetailedView', () => {
       refetch: mockRefetch,
     });
 
-    render(<DetailedView />);
+    renderWithIntl();
     expect(screen.getByText(/Failed to load/i)).toBeInTheDocument();
   });
 
@@ -67,7 +84,7 @@ describe('DetailedView', () => {
       refetch: mockRefetch,
     });
 
-    render(<DetailedView />);
+    renderWithIntl();
 
     expect(screen.queryByText('Id')).not.toBeInTheDocument();
     expect(screen.getByText(/The Legend Of Zelda/i)).toBeInTheDocument();
