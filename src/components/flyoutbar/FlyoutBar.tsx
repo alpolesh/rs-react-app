@@ -15,28 +15,30 @@ function FlyoutBar() {
     });
   };
 
-  const handleDownload = () => {
-    const csvRows = [
-      ['Name', 'Description', 'Game Id'],
-      ...selectedItems.map(([, game]) => [
-        game.name ?? '',
-        game.description ?? '',
-        game.gameId ?? '',
-      ]),
-    ];
+  const handleDownload = async () => {
+    const gamesArray = selectedItems.map(([, game]) => game);
 
-    const csvContent = csvRows
-      .map((row) =>
-        row.map((field) => `"${field.replace(/"/g, '""')}"`).join(',')
-      )
-      .join('\n');
+    const res = await fetch('/api/games-csv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ games: gamesArray }),
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const fileName = `${selectedCount}_games.csv`;
+    if (!res.ok) {
+      console.error('Failed to download CSV');
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
+    link.href = url;
+    link.download = `${selectedCount}_games.csv`;
+    document.body.appendChild(link);
     link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   return (
