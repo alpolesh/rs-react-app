@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
+import path from 'path';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig = {
-  distDir: './dist', // Changes the build output directory to `./dist/`.
+  distDir: './dist',
   webpack(config) {
+    config.resolve.alias['@src'] = path.resolve('./src');
+    config.resolve.alias['@components'] = path.resolve('./src/components');
+    config.resolve.alias['@assets'] = path.resolve('./src/assets');
+
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
@@ -13,5 +18,4 @@ const nextConfig = {
   },
 };
 
-const withNextIntl = createNextIntlPlugin();
-export default withNextIntl(nextConfig);
+export default createNextIntlPlugin(nextConfig);
