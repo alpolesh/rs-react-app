@@ -1,11 +1,23 @@
 import { useState } from 'react';
 
-export default function useModal(): [boolean, () => void] {
+export default function useModal(): [
+  boolean,
+  string,
+  (modalType: string) => void,
+  () => void,
+] {
   const [isModalOpen, setIsmodalOpen] = useState(false);
+  const [modalType, setModalType] = useState('');
 
-  const toggleModalState = () => {
-    setIsmodalOpen(!isModalOpen);
+  const openModal = (modalType: string) => {
+    setIsmodalOpen(true);
+    setModalType(modalType);
   };
 
-  return [isModalOpen, toggleModalState];
+  const closeModal = () => {
+    setIsmodalOpen(false);
+    setModalType('');
+  };
+
+  return [isModalOpen, modalType, openModal, closeModal];
 }
