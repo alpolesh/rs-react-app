@@ -20,7 +20,9 @@ function App() {
 
       {modalType && (
         <Modal hide={closeModal}>
-          {modalType === 'uncontrolled' && <UncontrolledForm />}
+          {modalType === 'uncontrolled' && (
+            <UncontrolledForm hide={closeModal} />
+          )}
           {modalType === 'react-hook-form' && <h1>React hook form</h1>}
         </Modal>
       )}

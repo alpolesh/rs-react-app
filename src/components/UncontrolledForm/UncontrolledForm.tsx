@@ -1,66 +1,27 @@
 import React, { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@src/store/index';
+import { createSchema } from '@src/validation/userFormScheme';
+import { useDispatch } from 'react-redux';
+import { saveUncontrolledFormData } from '@src/store/slices/uncontrolledFormDataSlice';
+import type { FormDataState } from '@src/types/FormDataState';
+import { fileToBase64 } from '@src/helpers/fileToBase64';
 import * as yup from 'yup';
 
-const countries = ['Germany', 'France', 'USA', 'Canada'];
+type Props = {
+  hide: () => void;
+};
 
-const schema = yup.object({
-  name: yup
-    .string()
-    .required('Name is required')
-    .test(
-      'first-letter-uppercase',
-      'First letter must be uppercase',
-      (value) => !value || /^[A-Z]/.test(value)
-    ),
-  age: yup
-    .number()
-    .required('Age is required')
-    .typeError('Age must be a number')
-    .min(0, 'Age cannot be negative'),
-  email: yup.string().required('Email is required').email('Invalid email'),
-  password1: yup
-    .string()
-    .required('Password is required')
-    .test(
-      'password-strength',
-      'Must include number, uppercase, lowercase, and special character',
-      (value) => {
-        if (!value) return true;
-        const hasNumber = /\d/.test(value);
-        const hasUpper = /[A-Z]/.test(value);
-        const hasLower = /[a-z]/.test(value);
-        const hasSpecial = /[@$!%*?&]/.test(value);
-        return hasNumber && hasUpper && hasLower && hasSpecial;
-      }
-    ),
-  password2: yup
-    .string()
-    .oneOf([yup.ref('password1')], 'Passwords must match')
-    .required('Please confirm password'),
-  gender: yup.string().required('Select gender'),
-  terms: yup.boolean().oneOf([true], 'Accept T&C'),
-  picture: yup
-    .mixed<File>()
-    .required('Picture is required')
-    .test(
-      'fileSize',
-      'File too large',
-      (value) => !value || value.size <= 2_000_000
-    )
-    .test(
-      'fileType',
-      'Unsupported format',
-      (value) => !value || ['image/png', 'image/jpeg'].includes(value.type)
-    ),
-  country: yup
-    .string()
-    .oneOf(countries, 'Select a valid country')
-    .required('Country is required'),
-});
-
-const UncontrolledFormWithValidation = () => {
+const UncontrolledFormWithValidation = ({ hide }: Props) => {
+  const dispatch = useDispatch();
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const countries = useSelector((state: RootState) => state.countries);
+  const uncontrolledFormData = useSelector<RootState, FormDataState | null>(
+    (state) => state.uncontrolledFormData
+  );
+  const schema = createSchema(countries);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +48,14 @@ const UncontrolledFormWithValidation = () => {
     try {
       await schema.validate(data, { abortEarly: false });
       setErrors({});
-      console.log('Form is valid', data);
+      let pictureBase64: string | undefined;
+      if (data.picture) {
+        pictureBase64 = await fileToBase64(data.picture);
+      }
+      const finalData = { ...data, picture: pictureBase64 };
+
+      dispatch(saveUncontrolledFormData(finalData));
+      hide();
     } catch (err) {
       if (err instanceof yup.ValidationError) {
         const newErrors: Record<string, string> = {};
@@ -111,6 +79,7 @@ const UncontrolledFormWithValidation = () => {
           name="name"
           type="text"
           className="mt-1 w-full border rounded px-3 py-2"
+          defaultValue={uncontrolledFormData?.name}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.name || '\u00A0'}
@@ -126,6 +95,7 @@ const UncontrolledFormWithValidation = () => {
           name="age"
           type="number"
           className="mt-1 w-full border rounded px-3 py-2"
+          defaultValue={uncontrolledFormData?.age}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.age || '\u00A0'}
@@ -141,6 +111,7 @@ const UncontrolledFormWithValidation = () => {
           name="email"
           type="email"
           className="mt-1 w-full border rounded px-3 py-2"
+          defaultValue={uncontrolledFormData?.email}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.email || '\u00A0'}
@@ -181,10 +152,22 @@ const UncontrolledFormWithValidation = () => {
         <label className="block font-medium">Gender</label>
         <div className="flex gap-4 mt-1">
           <label>
-            <input type="radio" name="gender" value="male" /> Male
+            <input
+              type="radio"
+              name="gender"
+              value="male"
+              defaultChecked={uncontrolledFormData?.gender === 'male'}
+            />{' '}
+            Male
           </label>
           <label>
-            <input type="radio" name="gender" value="female" /> Female
+            <input
+              type="radio"
+              name="gender"
+              value="female"
+              defaultChecked={uncontrolledFormData?.gender === 'female'}
+            />{' '}
+            Female
           </label>
         </div>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
@@ -194,7 +177,12 @@ const UncontrolledFormWithValidation = () => {
 
       <div className="mb-1">
         <label className="flex items-center gap-2">
-          <input type="checkbox" name="terms" /> I accept Terms & Conditions
+          <input
+            type="checkbox"
+            name="terms"
+            defaultChecked={uncontrolledFormData?.terms}
+          />{' '}
+          I accept Terms & Conditions
         </label>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.terms || '\u00A0'}
@@ -226,6 +214,7 @@ const UncontrolledFormWithValidation = () => {
           name="country"
           list="countries"
           className="mt-1 w-full border rounded px-3 py-2"
+          defaultValue={uncontrolledFormData?.country}
         />
         <datalist id="countries">
           {countries.map((country) => (
