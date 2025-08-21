@@ -1,8 +1,12 @@
-export default function InfoCard() {
+type Props = {
+  title: string;
+};
+
+export default function InfoCard({ title }: Props) {
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 w-full relative">
       <h3 className="text-xl text-center font-semibold text-gray-800 mb-4">
-        Uncontrolled form
+        {title}
       </h3>
 
       <ul className="space-y-2">
