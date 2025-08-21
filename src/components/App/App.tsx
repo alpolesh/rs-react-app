@@ -2,6 +2,7 @@ import useModal from '@src/hooks/useModal';
 import InfoCard from '@components/InfoCard/InfoCard';
 import Modal from '@components/Modal/Modal';
 import ModalButton from '@components/ModalButton/ModalButton';
+import UncontrolledForm from '@components/UncontrolledForm/UncontrolledForm';
 
 function App() {
   const [, modalType, openModal, closeModal] = useModal();
@@ -19,7 +20,7 @@ function App() {
 
       {modalType && (
         <Modal hide={closeModal}>
-          {modalType === 'uncontrolled' && <h1>Uncontrolled form</h1>}
+          {modalType === 'uncontrolled' && <UncontrolledForm />}
           {modalType === 'react-hook-form' && <h1>React hook form</h1>}
         </Modal>
       )}
