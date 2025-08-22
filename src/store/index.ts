@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import countriesSliceReducer from '@src/store/slices/countriesSlice';
-import uncontrolledFormDataSliceReducer from '@src/store/slices/uncontrolledFormDataSlice';
+import formsDataSliceReducer from '@src/store/slices/formsDataSlice';
 
 export const setupStore = () =>
   configureStore({
     reducer: {
       countries: countriesSliceReducer,
-      uncontrolledFormData: uncontrolledFormDataSliceReducer,
+      formsData: formsDataSliceReducer,
     },
   });
 

@@ -9,3 +9,13 @@ export type FormDataState = {
   picture?: string;
   country: string;
 };
+
+export type OrderedFormData = {
+  data: FormDataState;
+  order: (keyof FormDataState)[];
+};
+
+export type FormsData = {
+  uncontrolledFormData: OrderedFormData | null;
+  reactHookFormData: OrderedFormData | null;
+};

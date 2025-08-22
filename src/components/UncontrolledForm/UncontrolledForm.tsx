@@ -3,23 +3,24 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@src/store/index';
 import { createSchema } from '@src/validation/userFormScheme';
 import { useDispatch } from 'react-redux';
-import { saveUncontrolledFormData } from '@src/store/slices/uncontrolledFormDataSlice';
-import type { FormDataState } from '@src/types/FormDataState';
+import { saveUncontrolledFormData } from '@src/store/slices/formsDataSlice';
+import type { OrderedFormData } from '@src/types/FormDataState';
 import { fileToBase64 } from '@src/helpers/fileToBase64';
+import { getFormOrder } from '@src/helpers/getFormOrder';
 import * as yup from 'yup';
 
 type Props = {
   hide: () => void;
 };
 
-const UncontrolledFormWithValidation = ({ hide }: Props) => {
+const UncontrolledForm = ({ hide }: Props) => {
   const dispatch = useDispatch();
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const countries = useSelector((state: RootState) => state.countries);
-  const uncontrolledFormData = useSelector<RootState, FormDataState | null>(
-    (state) => state.uncontrolledFormData
+  const uncontrolledFormData = useSelector<RootState, OrderedFormData | null>(
+    (state) => state.formsData.uncontrolledFormData
   );
   const schema = createSchema(countries);
 
@@ -30,6 +31,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
 
     const formData = new FormData(form);
 
+    const pictureFile = formData.get('picture');
     const data = {
       name: formData.get('name') as string,
       age: formData.get('age') ? Number(formData.get('age')) : undefined,
@@ -39,8 +41,8 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
       gender: formData.get('gender') as string,
       terms: formData.get('terms') === 'on',
       picture:
-        formData.get('picture') instanceof File
-          ? (formData.get('picture') as File)
+        pictureFile instanceof File && pictureFile.size > 0
+          ? pictureFile
           : undefined,
       country: formData.get('country') as string,
     };
@@ -54,7 +56,9 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
       }
       const finalData = { ...data, picture: pictureBase64 };
 
-      dispatch(saveUncontrolledFormData(finalData));
+      const order = getFormOrder(form);
+      dispatch(saveUncontrolledFormData({ data: finalData, order }));
+
       hide();
     } catch (err) {
       if (err instanceof yup.ValidationError) {
@@ -79,7 +83,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
           name="name"
           type="text"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.name}
+          defaultValue={uncontrolledFormData?.data.name}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.name || '\u00A0'}
@@ -95,7 +99,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
           name="age"
           type="number"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.age}
+          defaultValue={uncontrolledFormData?.data.age}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.age || '\u00A0'}
@@ -111,7 +115,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
           name="email"
           type="email"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.email}
+          defaultValue={uncontrolledFormData?.data.email}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.email || '\u00A0'}
@@ -156,7 +160,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
               type="radio"
               name="gender"
               value="male"
-              defaultChecked={uncontrolledFormData?.gender === 'male'}
+              defaultChecked={uncontrolledFormData?.data.gender === 'male'}
             />{' '}
             Male
           </label>
@@ -165,7 +169,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
               type="radio"
               name="gender"
               value="female"
-              defaultChecked={uncontrolledFormData?.gender === 'female'}
+              defaultChecked={uncontrolledFormData?.data.gender === 'female'}
             />{' '}
             Female
           </label>
@@ -180,7 +184,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
           <input
             type="checkbox"
             name="terms"
-            defaultChecked={uncontrolledFormData?.terms}
+            defaultChecked={uncontrolledFormData?.data.terms}
           />{' '}
           I accept Terms & Conditions
         </label>
@@ -214,7 +218,7 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
           name="country"
           list="countries"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.country}
+          defaultValue={uncontrolledFormData?.data.country}
         />
         <datalist id="countries">
           {countries.map((country) => (
@@ -236,4 +240,4 @@ const UncontrolledFormWithValidation = ({ hide }: Props) => {
   );
 };
 
-export default UncontrolledFormWithValidation;
+export default UncontrolledForm;

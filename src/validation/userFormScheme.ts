@@ -37,8 +37,9 @@ export const createSchema = (countries: string[]) =>
       .required('Please confirm password'),
     gender: yup.string().required('Select gender'),
     terms: yup.boolean().oneOf([true], 'Accept T&C'),
-    icture: yup
+    picture: yup
       .mixed<File>()
+      .notRequired()
       .test(
         'fileSize',
         'File too large',
