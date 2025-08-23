@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { checkPasswordStrength } from '@src/helpers/checkPasswordStrength';
 
 export const createSchema = (countries: string[]) =>
   yup.object({
@@ -19,18 +20,11 @@ export const createSchema = (countries: string[]) =>
     password1: yup
       .string()
       .required('Password is required')
-      .test(
-        'password-strength',
-        'Must include number, uppercase, lowercase, and special character',
-        (value) => {
-          if (!value) return true;
-          const hasNumber = /\d/.test(value);
-          const hasUpper = /[A-Z]/.test(value);
-          const hasLower = /[a-z]/.test(value);
-          const hasSpecial = /[@$!%*?&]/.test(value);
-          return hasNumber && hasUpper && hasLower && hasSpecial;
-        }
-      ),
+      .test('password-strength', function (value) {
+        if (!value) return true;
+        const { isValid, message } = checkPasswordStrength(value);
+        return isValid || this.createError({ message });
+      }),
     password2: yup
       .string()
       .oneOf([yup.ref('password1')], 'Passwords must match')

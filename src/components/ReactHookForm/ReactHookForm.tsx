@@ -29,6 +29,7 @@ const ReactHookForm = ({ hide }: Props) => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ReactHookFormData>({
     resolver: yupResolver(schema) as Resolver<ReactHookFormData>,
@@ -46,6 +47,8 @@ const ReactHookForm = ({ hide }: Props) => {
     dispatch(saveReactHookFormData({ data: finalData, order }));
     hide();
   };
+
+  const password1Value = watch('password1');
 
   return (
     <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -106,8 +109,12 @@ const ReactHookForm = ({ hide }: Props) => {
           {...register('password1')}
           className="mt-1 w-full border rounded px-3 py-2"
         />
-        <p className="text-red-600 mt-1 h-6 overflow-auto">
-          {errors.password1?.message || '\u00A0'}
+        <p className="text-red-600 mt-1 h-13 overflow-auto whitespace-pre-line">
+          {errors.password1
+            ? errors.password1?.message || '\u00A0'
+            : password1Value && (
+                <span className="text-green-600 ">Password is strong</span>
+              )}
         </p>
       </div>
 

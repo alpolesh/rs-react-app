@@ -15,6 +15,7 @@ type Props = {
 const UncontrolledForm = ({ hide }: Props) => {
   const dispatch = useDispatch();
   const formRef = useRef<HTMLFormElement>(null);
+  const password1Ref = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const countries = useSelector((state: RootState) => state.countries);
@@ -124,9 +125,14 @@ const UncontrolledForm = ({ hide }: Props) => {
           name="password1"
           type="password"
           className="mt-1 w-full border rounded px-3 py-2"
+          ref={password1Ref}
         />
-        <p className="text-red-600 mt-1 h-6 overflow-auto">
-          {errors.password1 || '\u00A0'}
+        <p className="text-red-600 mt-1 h-13 overflow-auto whitespace-pre-line">
+          {errors.password1
+            ? errors.password1 || '\u00A0'
+            : password1Ref.current?.value && (
+                <span className="text-green-600 ">Password is strong</span>
+              )}
         </p>
       </div>
 
