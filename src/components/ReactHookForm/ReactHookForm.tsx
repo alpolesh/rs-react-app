@@ -134,15 +134,20 @@ const ReactHookForm = ({ hide }: Props) => {
       </div>
 
       <div className="mb-1">
-        <label className="block font-medium">Gender</label>
-        <div className="flex gap-4 mt-1">
-          <label>
-            <input type="radio" value="male" {...register('gender')} /> Male
-          </label>
-          <label>
-            <input type="radio" value="female" {...register('gender')} /> Female
-          </label>
-        </div>
+        <fieldset className="border-0 p-0 m-0">
+          <legend id="gender-legend" className="block font-medium">
+            Gender
+          </legend>
+          <div className="flex gap-4 mt-1">
+            <label>
+              <input type="radio" value="male" {...register('gender')} /> Male
+            </label>
+            <label>
+              <input type="radio" value="female" {...register('gender')} />{' '}
+              Female
+            </label>
+          </div>
+        </fieldset>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.gender?.message || '\u00A0'}
         </p>

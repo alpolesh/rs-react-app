@@ -2,19 +2,19 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { setupStore } from '@src/store/index';
-import UncontrolledForm from './UncontrolledForm';
+import ReactHookForm from './ReactHookForm';
 
 type AppStore = ReturnType<typeof setupStore>;
 
 const renderWithStore = (store: AppStore) => {
   return render(
     <Provider store={store}>
-      <UncontrolledForm hide={() => {}} />
+      <ReactHookForm hide={() => {}} />
     </Provider>
   );
 };
 
-describe('UncontrolledForm', () => {
+describe('ReactHookForm', () => {
   let store: AppStore;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('UncontrolledForm', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/gender/i)).toBeInTheDocument();
+    expect(screen.getByText(/gender/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/terms/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/upload picture/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/country/i)).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('UncontrolledForm', () => {
     await user.click(screen.getByRole('button', { name: /submit/i }));
 
     await waitFor(() => {
-      expect(store.getState().formsData.uncontrolledFormData?.data).toEqual(
+      expect(store.getState().formsData.reactHookFormData?.data).toEqual(
         expect.objectContaining({
           name: 'John Doe',
           age: 30,

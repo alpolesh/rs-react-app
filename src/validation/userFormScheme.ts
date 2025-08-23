@@ -13,6 +13,9 @@ export const createSchema = (countries: string[]) =>
       ),
     age: yup
       .number()
+      .transform((value, originalValue) =>
+        originalValue === '' ? undefined : value
+      )
       .required('Age is required')
       .typeError('Age must be a number')
       .min(0, 'Age cannot be negative'),
