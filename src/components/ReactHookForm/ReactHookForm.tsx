@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import type { Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { RootState } from '@src/store/index';
 import { saveReactHookFormData } from '@src/store/slices/formsDataSlice';
-import type { FormDataState, OrderedFormData } from '@src/types/FormDataState';
+import type { FormDataState } from '@src/types/FormDataState';
 import { fileToBase64 } from '@src/helpers/fileToBase64';
 import { createSchema } from '@src/validation/userFormScheme';
 import { getFormOrder } from '@src/helpers/getFormOrder';
@@ -22,9 +22,6 @@ const ReactHookForm = ({ hide }: Props) => {
   const formRef = useRef<HTMLFormElement>(null);
   const dispatch = useDispatch();
   const countries = useSelector((state: RootState) => state.countries);
-  const reactHookFormData = useSelector<RootState, OrderedFormData | null>(
-    (state) => state.formsData.reactHookFormData
-  );
 
   const schema = createSchema(countries);
 
@@ -35,26 +32,8 @@ const ReactHookForm = ({ hide }: Props) => {
     formState: { errors },
   } = useForm<ReactHookFormData>({
     resolver: yupResolver(schema) as Resolver<ReactHookFormData>,
-    defaultValues: reactHookFormData?.data
-      ? {
-          ...reactHookFormData.data,
-          picture: undefined,
-          password1: '',
-          password2: '',
-        }
-      : {},
     mode: 'onChange',
   });
-
-  useEffect(() => {
-    if (reactHookFormData?.data) {
-      Object.entries(reactHookFormData?.data).forEach(([key, value]) => {
-        if (key === 'password1' || key === 'password2' || key === 'picture')
-          return;
-        setValue(key as keyof FormDataState, value);
-      });
-    }
-  }, [reactHookFormData, setValue]);
 
   const onSubmit = async (data: ReactHookFormData) => {
     let pictureBase64: string | undefined;
@@ -215,6 +194,7 @@ const ReactHookForm = ({ hide }: Props) => {
       <button
         type="submit"
         className="bg-purple-600 text-white px-4 py-2 rounded mt-2"
+        disabled={Object.keys(errors).length > 0}
       >
         Submit
       </button>

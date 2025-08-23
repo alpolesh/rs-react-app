@@ -4,7 +4,6 @@ import type { RootState } from '@src/store/index';
 import { createSchema } from '@src/validation/userFormScheme';
 import { useDispatch } from 'react-redux';
 import { saveUncontrolledFormData } from '@src/store/slices/formsDataSlice';
-import type { OrderedFormData } from '@src/types/FormDataState';
 import { fileToBase64 } from '@src/helpers/fileToBase64';
 import { getFormOrder } from '@src/helpers/getFormOrder';
 import * as yup from 'yup';
@@ -19,9 +18,6 @@ const UncontrolledForm = ({ hide }: Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const countries = useSelector((state: RootState) => state.countries);
-  const uncontrolledFormData = useSelector<RootState, OrderedFormData | null>(
-    (state) => state.formsData.uncontrolledFormData
-  );
   const schema = createSchema(countries);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +79,6 @@ const UncontrolledForm = ({ hide }: Props) => {
           name="name"
           type="text"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.data.name}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.name || '\u00A0'}
@@ -99,7 +94,6 @@ const UncontrolledForm = ({ hide }: Props) => {
           name="age"
           type="number"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.data.age}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.age || '\u00A0'}
@@ -115,7 +109,6 @@ const UncontrolledForm = ({ hide }: Props) => {
           name="email"
           type="email"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.data.email}
         />
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.email || '\u00A0'}
@@ -156,22 +149,10 @@ const UncontrolledForm = ({ hide }: Props) => {
         <label className="block font-medium">Gender</label>
         <div className="flex gap-4 mt-1">
           <label>
-            <input
-              type="radio"
-              name="gender"
-              value="male"
-              defaultChecked={uncontrolledFormData?.data.gender === 'male'}
-            />{' '}
-            Male
+            <input type="radio" name="gender" value="male" /> Male
           </label>
           <label>
-            <input
-              type="radio"
-              name="gender"
-              value="female"
-              defaultChecked={uncontrolledFormData?.data.gender === 'female'}
-            />{' '}
-            Female
+            <input type="radio" name="gender" value="female" /> Female
           </label>
         </div>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
@@ -181,12 +162,7 @@ const UncontrolledForm = ({ hide }: Props) => {
 
       <div className="mb-1">
         <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="terms"
-            defaultChecked={uncontrolledFormData?.data.terms}
-          />{' '}
-          I accept Terms & Conditions
+          <input type="checkbox" name="terms" /> I accept Terms & Conditions
         </label>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.terms || '\u00A0'}
@@ -218,7 +194,6 @@ const UncontrolledForm = ({ hide }: Props) => {
           name="country"
           list="countries"
           className="mt-1 w-full border rounded px-3 py-2"
-          defaultValue={uncontrolledFormData?.data.country}
         />
         <datalist id="countries">
           {countries.map((country) => (
