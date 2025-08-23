@@ -152,23 +152,32 @@ const UncontrolledForm = ({ hide }: Props) => {
       </div>
 
       <div className="mb-1">
-        <label className="block font-medium">Gender</label>
-        <div className="flex gap-4 mt-1">
-          <label>
-            <input type="radio" name="gender" value="male" /> Male
-          </label>
-          <label>
-            <input type="radio" name="gender" value="female" /> Female
-          </label>
-        </div>
+        <fieldset className="border-0 p-0 m-0">
+          <legend id="gender-legend" className="block font-medium">
+            Gender
+          </legend>
+          <div
+            className="flex gap-4 mt-1"
+            role="radiogroup"
+            aria-labelledby="gender-legend"
+          >
+            <label>
+              <input type="radio" name="gender" value="male" /> Male
+            </label>
+            <label>
+              <input type="radio" name="gender" value="female" /> Female
+            </label>
+          </div>
+        </fieldset>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.gender || '\u00A0'}
         </p>
       </div>
 
       <div className="mb-1">
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="terms" /> I accept Terms & Conditions
+        <input type="checkbox" id="terms" name="terms" />
+        <label htmlFor="terms" className="flex items-center gap-2">
+          I accept Terms & Conditions
         </label>
         <p className="text-red-600 mt-1 h-6 overflow-auto">
           {errors.terms || '\u00A0'}
