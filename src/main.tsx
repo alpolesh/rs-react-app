@@ -1,9 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
-import App from './App.tsx';
+import { Provider } from 'react-redux';
+import { store } from '@src/store';
+import '@src/index.css';
+import App from '@components/App/App.tsx';
 
 const container = document.getElementById('root');
+container?.classList.add('w-full');
 
 if (!container) {
   throw new Error('Root element not found');
@@ -11,6 +14,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </StrictMode>
 );
