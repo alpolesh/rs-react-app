@@ -12,7 +12,8 @@
     "prepare": "husky",
     "format:fix": "prettier --write .",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "lint:i18n": "i18n-check -s en -l messages/"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
+    "@lingual/i18n-check": "^0.8.6",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

@@ -1,8 +1,6 @@
-// import { useSearchParams } from 'react-router';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 function useCustomSearchParams(paramKey: string) {
-  // const [searchParams, setSearchParams] = useSearchParams();
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchParam = searchParams.get(paramKey) || '';
