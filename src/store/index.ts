@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import savedGamesReducer from '@src/store/slices/savedGamesSlice';
+import searchTermReducer from '@src/store/slices/searchTermSlice';
 import { gamesApi } from '@src/store/api/gamesApi';
 
 export const setupStore = () =>
   configureStore({
     reducer: {
       savedGames: savedGamesReducer,
+      searchTerm: searchTermReducer,
       [gamesApi.reducerPath]: gamesApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

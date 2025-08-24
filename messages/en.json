@@ -1,0 +1,55 @@
+{
+  "Results": {
+    "title": "Search Results",
+    "noResults": "No results found",
+    "refetchButton": "Refetch List"
+  },
+
+  "About": {
+    "title": "About the Author",
+    "description": "This application was created by Andrei Paleshchuk. It demonstrates React (CSR, SSR), Redux (RTK query), React Router, App Router and pagination.",
+    "linkMessage": {
+      "before": "Check out the ",
+      "linkText": "RS School React course",
+      "after": " for more learning materials."
+    }
+  },
+
+  "Searchbar": {
+    "searchButton": "Search"
+  },
+
+  "Header": {
+    "linkAbout": "About"
+  },
+
+  "LangSwitcher": {
+    "label": "Language:",
+    "options": {
+      "en": "Eng",
+      "ru": "Rus"
+    }
+  },
+
+  "ThemeSwitcher": {
+    "label": "Theme:",
+    "options": {
+      "light": "Light",
+      "dark": "Dark"
+    }
+  },
+
+  "Pagination": {
+    "prev": "Prev",
+    "next": "Next"
+  },
+
+  "DetailedView": {
+    "title": "Detailed view",
+    "refetchButton": "Refetch game"
+  },
+
+  "NotFound": {
+    "title": "404 — Page Not Found"
+  }
+}

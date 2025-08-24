@@ -1,0 +1,55 @@
+{
+  "Results": {
+    "title": "Результаты поиска",
+    "noResults": "Ничего не найдено",
+    "refetchButton": "Рефетч игр"
+  },
+
+  "About": {
+    "title": "Об авторе",
+    "description": "Это приложение создано Андреем Полещуком. Оно демонстрирует навыки использования React (CSR, SSR), Redux (RTK query), React Router, App Router и пагинацию.",
+    "linkMessage": {
+      "before": "Посмотрите ",
+      "linkText": "Курс по реакту от школы Rolling scopes",
+      "after": " для получения большей информации."
+    }
+  },
+
+  "Searchbar": {
+    "searchButton": "Поиск"
+  },
+
+  "Header": {
+    "linkAbout": "О приложении"
+  },
+
+  "LangSwitcher": {
+    "label": "Язык:",
+    "options": {
+      "en": "Англ",
+      "ru": "Рус"
+    }
+  },
+
+  "ThemeSwitcher": {
+    "label": "Тема:",
+    "options": {
+      "light": "Светлая",
+      "dark": "Темная"
+    }
+  },
+
+  "Pagination": {
+    "prev": "Пред",
+    "next": "След"
+  },
+
+  "DetailedView": {
+    "title": "Детали игры",
+    "refetchButton": "Рефетч игры"
+  },
+
+  "NotFound": {
+    "title": "404 — Страница не найдена"
+  }
+}

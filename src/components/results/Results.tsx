@@ -1,89 +1,85 @@
 import { useSelector } from 'react-redux';
 import type { RootState } from '@src/store';
 import useCustomSearchParams from '@src/hooks/useCustomSearchParams';
+import { useGetGamesByNameQuery } from '@src/store/api/gamesApi';
+import getErrorMessage from '@src/helpers/getErrorMessage';
+import ResultsWrapper from '@components/results/ResultsWrapper';
 import ErrorResults from '@components/results/ErrorResults';
 import ResultItem from '@components/results/ResultItem';
 import Pagination from '@components/pagination/Pagination';
-import FlyoutBar from '@components/flyoutbar/FlyoutBar';
+import { useTranslations } from 'next-intl';
 
-interface SearchResult {
-  name?: string;
-  description?: string;
-  id: string;
-}
-
-interface ResultsProps {
-  results: SearchResult[];
-  error: string | undefined;
-  onChangeGameId: (gameId: string) => void;
-  refetchGames: () => void;
-}
-
-function Results({
-  results,
-  error,
-  onChangeGameId,
-  refetchGames,
-}: ResultsProps) {
+function Results() {
+  const t = useTranslations('Results');
   const [pageParam, setPageParamToExistedParams] =
     useCustomSearchParams('page');
   const currentPage = Number(pageParam || '1');
 
-  const savedGames = useSelector((state: RootState) => state.savedGames);
+  const searchTerm = useSelector((state: RootState) => state.searchTerm);
+
+  const {
+    data: games = [],
+    error: gamesError,
+    isFetching: isGamesFetching,
+    refetch: refetchGames,
+  } = useGetGamesByNameQuery(searchTerm);
 
   const itemsPerPage = 3;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedResults = games.slice(startIndex, startIndex + itemsPerPage);
 
   const handleChangePage = (page: number) => {
     setPageParamToExistedParams(page.toString());
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-md p-6 mx-auto mt-8 w-full relative">
-      <button
-        onClick={refetchGames}
-        className="absolute top-4 !p-[5px] left-4 bg-purple-600"
-        aria-label="Refetch game details"
+  if (gamesError) {
+    return (
+      <ResultsWrapper
+        refetchGames={refetchGames}
+        isGamesFetching={isGamesFetching}
       >
-        Refetch list
-      </button>
-
-      <h3 className="text-xl text-center font-semibold text-gray-800 mb-4">
-        Search Results
-      </h3>
-
-      {error ? (
         <div className="text-red-600">
-          <ErrorResults error={error} />
+          <ErrorResults error={getErrorMessage(gamesError)} />
         </div>
-      ) : results.length === 0 ? (
-        <p className="text-gray-500 italic">No results found.</p>
-      ) : (
-        <>
-          <ul className="space-y-2">
-            {paginatedResults.map((item) => {
-              return (
-                <ResultItem
-                  key={item.id}
-                  gameId={item.id}
-                  onChangeGameId={onChangeGameId}
-                  name={item.name}
-                  description={item.description}
-                />
-              );
-            })}
-          </ul>
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            totalItems={results.length}
-            currentPage={currentPage}
-            handleChangePage={handleChangePage}
-          />
-          {Object.keys(savedGames).length > 0 && <FlyoutBar />}
-        </>
-      )}
-    </div>
+      </ResultsWrapper>
+    );
+  }
+
+  if (games.length === 0) {
+    return (
+      <ResultsWrapper
+        refetchGames={refetchGames}
+        isGamesFetching={isGamesFetching}
+      >
+        <p className="text-gray-500 italic">{t('noResults')}</p>
+      </ResultsWrapper>
+    );
+  }
+
+  return (
+    <ResultsWrapper
+      refetchGames={refetchGames}
+      isGamesFetching={isGamesFetching}
+    >
+      <ul className="space-y-2">
+        {paginatedResults.map((item) => {
+          return (
+            <ResultItem
+              key={item.id}
+              gameId={item.id}
+              name={item.name}
+              description={item.description}
+            />
+          );
+        })}
+      </ul>
+      <Pagination
+        itemsPerPage={itemsPerPage}
+        totalItems={games.length}
+        currentPage={currentPage}
+        handleChangePage={handleChangePage}
+      />
+    </ResultsWrapper>
   );
 }
 
