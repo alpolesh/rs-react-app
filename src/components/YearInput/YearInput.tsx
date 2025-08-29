@@ -5,12 +5,12 @@ type Props = {
 
 export default function YearInput({ selectedYear, setSelectedYear }: Props) {
   return (
-    <>
+    <div className="flex items-center w-3xs mb-2">
       <label htmlFor="year" className="mx-5">
         Year
       </label>
       <input
-        className="px-4 my-5 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
+        className="px-4 py-2 w-full border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
         id="year"
         type="number"
         value={selectedYear ?? ''}
@@ -19,6 +19,6 @@ export default function YearInput({ selectedYear, setSelectedYear }: Props) {
           setSelectedYear(val ? parseInt(val) : undefined);
         }}
       ></input>
-    </>
+    </div>
   );
 }
