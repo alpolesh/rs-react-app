@@ -4,7 +4,7 @@ type CellProps = {
   value: string | number | 'N/A';
 };
 
-function HighlightedCell({ value }: CellProps) {
+function TableCell({ value }: CellProps) {
   const highlight = useHighlightOnChange(value);
   return (
     <td
@@ -17,4 +17,4 @@ function HighlightedCell({ value }: CellProps) {
   );
 }
 
-export default HighlightedCell;
+export default TableCell;
