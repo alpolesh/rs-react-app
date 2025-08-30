@@ -133,7 +133,11 @@ export default function CountriesList({
           {sortedRows.map((row) => (
             <tr key={row.name}>
               {Object.keys(row).map((key) => (
-                <TableCell key={`${row.iso_code}:${key}`} value={row[key]} />
+                <TableCell
+                  key={`${row.iso_code}:${key}`}
+                  value={row[key]}
+                  year={row.year}
+                />
               ))}
             </tr>
           ))}

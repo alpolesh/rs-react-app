@@ -1,11 +1,12 @@
-import useHighlightOnChange from '../../hooks/useHighlightOnChange';
+import useHighlightOnYearChange from '../../hooks/useHighlightOnChange';
 
 type CellProps = {
   value: string | number | 'N/A';
+  year: number;
 };
 
-function TableCell({ value }: CellProps) {
-  const highlight = useHighlightOnChange(value);
+function TableCell({ value, year }: CellProps) {
+  const highlight = useHighlightOnYearChange(value, year);
   return (
     <td
       className={`border px-2 py-1 transition-colors duration-500 ${

@@ -1,19 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
 
-function useHighlightOnChange<T>(value: T, duration = 1000) {
+type RefProps<T> = {
+  year: number | null;
+  value: T | null;
+};
+
+function useHighlightOnYearChange<T>(value: T, year: number, duration = 1000) {
   const [highlight, setHighlight] = useState(false);
-  const prevRef = useRef<T>(null);
+  const prevYearRef = useRef<RefProps<T>>({ year: null, value: null });
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (prevRef.current !== undefined && prevRef.current !== value) {
-      setHighlight(true);
-      const t = setTimeout(() => setHighlight(false), duration);
-      return () => clearTimeout(t);
+    if (isFirstRender.current) {
+      prevYearRef.current = { year, value };
+      isFirstRender.current = false;
+      return;
     }
-    prevRef.current = value;
-  }, [value, duration]);
+    if (
+      prevYearRef.current.year !== year &&
+      prevYearRef.current.value !== value
+    ) {
+      setHighlight(true);
+      setTimeout(() => setHighlight(false), duration);
+      prevYearRef.current = { year, value };
+    }
+  }, [year, value, duration]);
 
   return highlight;
 }
 
-export default useHighlightOnChange;
+export default useHighlightOnYearChange;
