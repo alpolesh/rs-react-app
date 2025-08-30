@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 const EXTRA_COLUMNS = [
   'nitrous_oxide',
@@ -21,7 +21,7 @@ export default function AdditionalRowsModal({
   extraColumns,
 }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
-  const applyExtraColumns = () => {
+  const applyExtraColumns = useCallback(() => {
     const checkedInputs = Array.from(
       formRef.current?.querySelectorAll<HTMLInputElement>(
         'input[type="checkbox"]:checked'
@@ -29,7 +29,7 @@ export default function AdditionalRowsModal({
     );
     setExtraColumns(checkedInputs.map((input) => input.value));
     setShowModal(false);
-  };
+  }, [setExtraColumns, setShowModal]);
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40"></div>

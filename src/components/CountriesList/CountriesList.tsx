@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { loadCo2Data } from '../../resource/co2Resource';
 import TableCell from './TableCell';
 
@@ -27,60 +27,65 @@ export default function CountriesList({
   extraColumns,
   searchTerm,
 }: Props) {
-  const data = loadCo2Data();
+  const data = useMemo(() => loadCo2Data(), []);
 
   const [sortBy, setSortBy] = useState<SortBy>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const rows: RowData[] = Object.entries(data).map(([name, country]) => {
-    const latestData = [...country.data]
-      .reverse()
-      .find((d) => d.population !== undefined);
+  const rows: RowData[] = useMemo(() => {
+    return Object.entries(data).map(([name, country]) => {
+      const latestData = [...country.data]
+        .reverse()
+        .find((d) => d.population !== undefined);
 
-    const y =
-      selectedYear !== undefined
-        ? (country.data.find((d) => d.year === selectedYear) ??
-          country.data[country.data.length - 1])
-        : (latestData ?? country.data[country.data.length - 1]);
+      const y =
+        selectedYear !== undefined
+          ? (country.data.find((d) => d.year === selectedYear) ??
+            country.data[country.data.length - 1])
+          : (latestData ?? country.data[country.data.length - 1]);
 
-    const base: RowData = {
-      name,
-      populationLast: latestData?.population ?? 'N/A',
-      iso_code: country.iso_code ?? 'N/A',
-      year: y.year,
-      population: y.population ?? 'N/A',
-      co2: y.co2 ?? 'N/A',
-      co2_per_capita: y.co2_per_capita ?? 'N/A',
-    };
+      const base: RowData = {
+        name,
+        populationLast: latestData?.population ?? 'N/A',
+        iso_code: country.iso_code ?? 'N/A',
+        year: y.year,
+        population: y.population ?? 'N/A',
+        co2: y.co2 ?? 'N/A',
+        co2_per_capita: y.co2_per_capita ?? 'N/A',
+      };
 
-    extraColumns.forEach((col) => {
-      base[col] = y[col] ?? 'N/A';
+      extraColumns.forEach((col) => {
+        base[col] = y[col] ?? 'N/A';
+      });
+
+      return base;
     });
+  }, [data, selectedYear, extraColumns]);
 
-    return base;
-  });
+  const filteredRows = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return rows.filter((row) => row.name.toLowerCase().includes(term));
+  }, [rows, searchTerm]);
 
-  const filteredRows = rows.filter((row) =>
-    row.name.toLowerCase().includes(searchTerm.toLowerCase() || '')
-  );
+  const sortedRows = useMemo(() => {
+    return [...filteredRows].sort((a, b) => {
+      const aValue: string | number =
+        sortBy === 'population' ? a.populationLast : a[sortBy];
+      const bValue: string | number =
+        sortBy === 'population' ? b.populationLast : b[sortBy];
 
-  const sortedRows = [...filteredRows].sort((a, b) => {
-    const aValue: string | number =
-      sortBy === 'population' ? a.populationLast : a[sortBy];
-    const bValue: string | number =
-      sortBy === 'population' ? b.populationLast : b[sortBy];
+      if (aValue === 'N/A') return 1;
+      if (bValue === 'N/A') return -1;
 
-    if (aValue === 'N/A') return 1;
-    if (bValue === 'N/A') return -1;
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
 
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-    }
-
-    return sortDirection === 'asc'
-      ? String(aValue).localeCompare(String(bValue))
-      : String(bValue).localeCompare(String(aValue));
-  });
+      return sortDirection === 'asc'
+        ? String(aValue).localeCompare(String(bValue))
+        : String(bValue).localeCompare(String(aValue));
+    });
+  }, [filteredRows, sortBy, sortDirection]);
 
   return (
     <div>
