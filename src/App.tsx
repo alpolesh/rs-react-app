@@ -1,35 +1,53 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { Suspense, useState } from 'react';
+import CountriesList from './components/CountriesList/CountriesList';
+import Spinner from './components/Spinner/Spinner';
+import YearInput from './components/YearInput/YearInput';
+import AdditionalRowsModal from './components/AdditionalRowsModal/AdditionalRowsModal';
+import CountrySearchbar from './components/CountrySearchbar/CountrySearchbar';
 
-function App() {
-  const [count, setCount] = useState(0);
+export default function App() {
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(
+    undefined
+  );
+  const [showModal, setShowModal] = useState(false);
+  const [extraColumns, setExtraColumns] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <Suspense fallback={<Spinner />}>
+      <div className="flex py-5">
+        <div className="flex flex-col max-w-3xs">
+          <YearInput
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+          />
+          <CountrySearchbar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
+        </div>
+
+        <button
+          onClick={() => setShowModal(true)}
+          className="ml-4 px-4 py-2 h-fit bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+        >
+          Customize Columns
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <CountriesList
+        selectedYear={selectedYear}
+        extraColumns={extraColumns}
+        searchTerm={searchTerm}
+      />
+
+      {showModal && (
+        <AdditionalRowsModal
+          setShowModal={setShowModal}
+          setExtraColumns={setExtraColumns}
+          extraColumns={extraColumns}
+        />
+      )}
+    </Suspense>
   );
 }
-
-export default App;
